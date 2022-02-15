@@ -1,0 +1,1 @@
+# This is Master Folder. All changes to this should be approved by the group to avoid merge conflicts.
