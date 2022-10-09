@@ -3,6 +3,33 @@
 #define NUM_MSG 10 //change to 100 later
 #define BAUD_RATE 250000
 #define NUM_LOG 100
+//UART Codes from google sheet
+#define Ready 0000001
+#define Contacts 0000010
+#define Del_Contacts 0000011
+#define Add_Contacts 0000100
+#define Send_n1 0000101
+#define Send_n2 0000110
+#define Send_n3 0000111
+#define Send_n4 0001000
+#define Acknoledge 0001001
+#define Repeat 0001010
+#define Boot 0001011
+//Screen Codes from google sheet
+#define Log_Screen_Code 0000000000000001
+#define Main_Screen_Code 0000000000000010
+#define Log_Page_Down 0000000000000011
+#define Log_Page_Up 0000000000000100
+#define Send_Screen_Code 0000000000000101
+#define Add_Contact 0000000000000110
+#define Delete_Contact 0000000000000111
+#define Contacts_Page_Down 0000000000001000
+#define Contacts_Page_Up 0000000000001001
+#define Contact_1 0000000000001010
+#define Contact_2 0000000000001011
+#define Contact_3 0000000000001100
+#define Contact_4 0000000000001101
+#define Contacts_Screen 0000000000001110
 
 const int csPin = 7;
 const int resetPin = 6;
