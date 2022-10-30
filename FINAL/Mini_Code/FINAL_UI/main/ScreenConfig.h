@@ -51,14 +51,14 @@ int setupSerial() {
     //Serial.begin(BAUD_RATE, SERIAL_8E2); //8 data bits, even parity, 2 stop bits
     Serial.begin(BAUD_RATE);
     //do handshake
-    Serial.write(BOOT);
+    /*Serial.write(BOOT);
     while (true) { //wait for handshake
         if (Serial.available()) {
             uint8_t ack = Serial.read();
             break;
         }
     }
-    Serial.write(BOOT);
+    Serial.write(BOOT);*/ 
     return 1;
 }
 
@@ -75,7 +75,6 @@ uint8_t startScreen() {
     delay(100); //turn on screen
 
     tft.reset(); //reset screen
-
 
     tft.begin(0x9341); //initialize tft
     tft.setRotation(1); //make landscape
