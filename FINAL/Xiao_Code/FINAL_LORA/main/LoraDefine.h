@@ -41,7 +41,7 @@
 #define RESET_PIN D2;
 #define IRQ_PIN D1;
 
-#define BAUD_RATE 250000
+#define BAUD_RATE 9600 
 #define CARRIER_FREQ 915E6
 
 //Memory Allocation
