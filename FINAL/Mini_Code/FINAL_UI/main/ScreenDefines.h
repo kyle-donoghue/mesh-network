@@ -198,7 +198,10 @@
 #define MSG_LOG2 21
 #define MSG_LOG3 22
 #define MSG_LOG4 23
-#define CONTS_REC 24
+#define CONTS_REC_N1 24
+#define CONTS_REC_N2 25
+#define CONTS_REC_N3 26
+#define CONTS_REC_N4 27
 
 //Screen Codes
 #define LOG_SCREEN_CODE 1

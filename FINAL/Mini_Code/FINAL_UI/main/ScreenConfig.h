@@ -45,20 +45,24 @@ uint8_t textPlaceholder2 = 0;
 
 uint16_t currentContactIDs[4] = {0}; //can hold 4 contacts at a time
 char currentContactNames[4][14] = {0};
+char currentContacts[2][128] = {0};
 uint8_t currentScreen = MAIN_SCREEN_CODE;
+
+uint8_t serialPipe[64] = {0};
+uint8_t serialCounter = 0;
 
 int setupSerial() {
     //Serial.begin(BAUD_RATE, SERIAL_8E2); //8 data bits, even parity, 2 stop bits
     Serial.begin(BAUD_RATE);
     //do handshake
-    /*Serial.write(BOOT);
+    Serial.write(BOOT);
     while (true) { //wait for handshake
         if (Serial.available()) {
             uint8_t ack = Serial.read();
             break;
         }
     }
-    Serial.write(BOOT);*/ 
+    Serial.write(BOOT); 
     return 1;
 }
 

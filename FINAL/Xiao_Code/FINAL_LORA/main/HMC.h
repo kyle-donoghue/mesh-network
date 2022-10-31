@@ -16,8 +16,11 @@ uint8_t handler = READY;
 uint8_t expectedSerial = 1; //1 for waiting for code or ack; 64 for most other cases
 char messageToSend[150] = {0};
 
+uint8_t serialPipe[64] = {0};
+uint8_t serialCounter = 0;
+
 void printTest(){
-  Serial.write(contacts[0],156);
+  //Serial.write(contacts[0],156);
   return;
 }
 
@@ -34,12 +37,14 @@ uint8_t initializeContacts() { //split row into bytes to be processed
     for (uint8_t j = 0; j < 2; j++) {
           contacts[0][j] = (ID>>((1-j)*8)) & 0xFF; //sets first 2 bytes to be the ID
       }
-    for (uint8_t j = 2; j < 16; j++) {
+    for (uint8_t j = 2; j < 14; j++) {
           contacts[0][j] = name[j-2];// sets bytes 2 - 16 as the Name 
       }
-    for (uint8_t j = 16; j < 156; j++){
-          contacts[0][j] = msg[j-16]; // sets 16-156 as the msg 
+    for (uint8_t j = 14; j < 156; j++){
+          contacts[0][j] = msg[j-14]; // sets 16-156 as the msg 
       }
+
+    
   return 0;  //Serial1.write(contacts[0],156)
 }
 
@@ -103,20 +108,38 @@ uint8_t displayMessage(uint8_t numMessage) {
 
 uint8_t sendContacts(uint8_t firstContact) {
 
-    for (uint8_t i = firstContact; i < firstContact+2;i++) {
-        if (i < NUM_CONTS) {
-            for (uint8_t j = 0; j < 16; j++) {
-                Serial1.write(contacts[i][j]); //should change to write('',n)
-            }
-        }
-        else {
-            for (uint8_t j = 0; j < 16; j++) {
-                Serial1.write((byte) 0x00);
-            } 
-        }
+    // for (uint8_t i = firstContact; i < firstContact+2;i++) {
+    //     if (i < NUM_CONTS) {
+    //         for (uint8_t j = 0; j < 156; j++) {
+    //             Serial1.write(contacts[i][j]); //should change to write('',n)
+    //         }
+    //     }
+    //     else {
+    //         for (uint8_t j = 0; j < 156; j++) {
+    //             Serial1.write((byte) 0x00);
+    //         } 
+    //     }
+    // }
+    for (uint8_t i = 0; i < 2; i++) { //send 2 chunks of 64 bytes
+         //for j=i*64,j<(i+1)*64,i++
+         //serial.write contacts[index][j]
+         for(uint8_t j = (i*64); j < ((i+1)*64); j++){
+            Serial1.write(contacts[firstContact][j]);
+         }
+         //Serial.println("sent chunk, waiting");
+        waitForAck();
+        //Serial.println("got ack");
     }
-
+    for (uint8_t i = 0; i < 2; i++) { //send 2 chunks of 64 bytes
+        for(uint8_t j = (i*64); j < ((i+1)*64); j++){
+            Serial1.write(contacts[firstContact + 1][j]);
+         } 
+        //Serial.println("sent chunk, waiting.2");    
+        waitForAck();
+        //Serial.println("got ack.2");
+    }
     return READY;
+    //return READY;
 }
 
 bool messageExists(uint16_t msgID) {
@@ -265,22 +288,23 @@ uint8_t handleUART(uint8_t handleCode) {
         case MSG_SEND: //xiao sends message received
             tmp_handler = SEND_N1;
             expectedSerial = 64;
+            Serial1.write(ACK);
             break;
         case ADD_CONT:
             tmp_handler = ADD_CONT;
-            expectedSerial = 12;
+            expectedSerial = 14;
+            Serial1.write(ACK);
             break;
         case DEL_CONT:
             tmp_handler = DEL_CONT;
-            expectedSerial = 4;
+            expectedSerial = 2;
+            Serial1.write(ACK);
             break;
         case REQ_CONTS:
+            //Serial.println("got req conts code");
             tmp_handler = REQ_CONTS;
             expectedSerial = 1;
-            break;
-        case MSG_DISP:
-            tmp_handler = MSG_DISP;
-            expectedSerial = 1;
+            //Serial1.write(ACK);
             break;
         default: ;
     }
@@ -382,7 +406,102 @@ void receiveUART () {
     }
 }
 
+void evaluatePipe () {
+    switch(handler) {
+        case SEND_N1: {
+            for (uint8_t i = 0; i < 64; i++) {
+                messageToSend[i] = serialPipe[63-i]; //need to comply with 144
+            }
+            serialCounter = 0;
+            handler = SEND_N2;
+            Serial1.write(ACK);
+            break;
+        }
+        case SEND_N2: {
+            for (uint8_t i = 0; i < 50; i++) {
+                messageToSend[i+64] = serialPipe[63-i];
+            }
+            uint16_t N_ID = NETWORK_ID;
+            uint16_t M_ID = 1354;//TO-DO: this
+            uint16_t R_ID = getID(messageToSend,4);
+            uint16_t S_ID = DEVICE_ID;
+            char message[112] = {0};
+            for (uint8_t i = 0; i < 112; i++) {
+                message[i] = messageToSend[i+2];
+            }
+            sendMessage(N_ID, M_ID, R_ID, S_ID, message);
+            Serial1.write(ACK);
+            handler = READY;
+            expectedSerial = 1;
+            break;
+        }
+        case ADD_CONT: {
+            uint16_t contactID = 0;
+            char contactName[12] = {0};
+            char tmpID[2] = {0};
+            for(uint8_t i =0;i<2;i++) //get ID
+            {
+                tmpID[i] = Serial1.read();
+            }
+            contactID = ((uint8_t)tmpID[0]<<8)|((uint8_t)tmpID[1]);
+            for(uint8_t i =0;i<14;i++) //get Name
+            {
+                contactName[i] = Serial1.read();
+            }
+            handler = addContact(contactID, contactName);
+            expectedSerial = 1;
+            break;
+        }
+        case DEL_CONT: {
+            uint16_t contactID = 0;
+            char tmpID[2] = {0};
+            for(uint8_t i =0;i<2;i++) //get ID
+            {
+                tmpID[i] = Serial1.read();
+            }
+            contactID = ((uint8_t)tmpID[0]<<8)|((uint8_t)tmpID[1]);
+            handler = deleteContact(contactID);
+            expectedSerial = 1;
+            break;
+        }
+        case REQ_CONTS: {
+            //Serial.print("got index ");
+            uint8_t firstContact = serialPipe[0];
+            //Serial.println(firstContact);
+            handler = sendContacts(firstContact);
+            expectedSerial = 1;
+            handler = READY;
+            Serial1.write(ACK);
+            //Serial.println("req conts done");
+           break;
+        }
+        case READY: {
+            uint8_t handleCode = Serial1.read();
+            handler = handleUART(handleCode);
+            serialCounter = 0;
+            break;
+        }
+        default: ;
+            
+    }
+}
 
+
+void processByte() {
+    
+    //shift right arrray for loop
+    //serial.read into [0]
+    //increase serial coutner
+    
+    for(int i = 63; i > 0; i++)
+    {
+        serialPipe[i] = serialPipe[i-1]; // right shifts data
+    }
+    serialPipe[0] = Serial1.read();//reads first element
+    Serial.write(serialPipe[0]);
+    serialCounter++;
+    return;
+}
 
 int setupHMC() {
 
@@ -403,13 +522,13 @@ int setupSerial() {
     Serial1.begin(BAUD_RATE);
     
 
-    /*Serial1.write(BOOT);
+    Serial1.write(BOOT);
     while (true) { //wait for handshake
         if (Serial1.available()) {
             uint8_t ack = Serial1.read();
             break;
         }
     }
-    Serial1.write(BOOT);*/
+    Serial1.write(BOOT);
     return 1;
 }

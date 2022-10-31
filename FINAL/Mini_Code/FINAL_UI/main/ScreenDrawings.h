@@ -52,9 +52,9 @@ void requestMessage(uint8_t numMessage, uint8_t num) { //get the nth message
 }
 
 void requestContacts(uint8_t firstContact) { //get 4 contacts at once
-    //Serial.write(REQ_CONTS);
+    Serial.write(REQ_CONTS);
     expectedSerial = 64;
-    handler = CONTS_REC;
+    handler = CONTS_REC_N1;
 }
 
 void drawMainScreen() { // 2
@@ -76,45 +76,43 @@ void drawMainScreen() { // 2
 }
 
 void drawContactsScreen() { // 14
-    char send[4] = {'s','e','n','d'};
-    Serial.write(send,4);
     tft.fillScreen(BLACK);
     
     // MAIN/HOME BUTTON
-//    tft.fillTriangle(MAIN_BUTTON_X,MAIN_BUTTON_Y + 20,MAIN_BUTTON_X + 20,MAIN_BUTTON_Y, MAIN_BUTTON_X + 40,MAIN_BUTTON_Y+20,MAGENTA );
-//    tft.fillRect(MAIN_BUTTON_X + 5, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
-//    tft.setCursor(MAIN_BUTTON_X + 9,MAIN_BUTTON_Y + 30);
-//    tft.setTextColor(WHITE);
-//    tft.setTextSize(1);
-//    tft.println("HOME");
+   tft.fillTriangle(MAIN_BUTTON_X,MAIN_BUTTON_Y + 20,MAIN_BUTTON_X + 20,MAIN_BUTTON_Y, MAIN_BUTTON_X + 40,MAIN_BUTTON_Y+20,MAGENTA );
+   tft.fillRect(MAIN_BUTTON_X + 5, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
+   tft.setCursor(MAIN_BUTTON_X + 9,MAIN_BUTTON_Y + 30);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("HOME");
 
     // Device ID
-//    tft.setCursor(60, 15);
-//    tft.setTextColor(WHITE);
-//    tft.setTextSize(2);
-//    tft.print("ID: ");
-//    uint16_t deviceID = DEVICE_ID;
-//    tft.println(deviceID);
-//
-//    // ADD CONTACTS BUTTON
-//    tft.fillCircle(ADD_CONTACT_BUTTON_X,ADD_CONTACT_BUTTON_Y, ADD_CONTACT_BUTTON_X_WIDTH,BLUE);
-//    tft.setCursor(ADD_CONTACT_BUTTON_X - 8,ADD_CONTACT_BUTTON_Y-2);
-//    tft.setTextColor(WHITE);
-//    tft.setTextSize(1);
-//    tft.println("ADD");
-//
-//    // DELETE CONTACTS BUTTON
-//    tft.fillRect(DELETE_CONTACT_BUTTON_X,DELETE_CONTACT_BUTTON_Y,DELETE_CONTACT_BUTTON_X_WIDTH,DELETE_CONTACT_BUTTON_Y_WIDTH,RED );
-//    tft.setCursor(DELETE_CONTACT_BUTTON_X + 10,DELETE_CONTACT_BUTTON_Y + 5);
-//    tft.setTextColor(WHITE);
-//    tft.setTextSize(1);
-//    tft.println("DEL");
-//
-//    // BUTTON-UP
-//    tft.fillTriangle(CONTACT1_BUTTON_X_WIDTH + 10, CONTACT1_BUTTON_Y - 30, CONTACT1_BUTTON_X_WIDTH, CONTACT1_BUTTON_Y - 5, CONTACT1_BUTTON_X_WIDTH + 20, CONTACT1_BUTTON_Y - 5, WHITE);
-//
-//    // BUTTON DOWN 
-//     tft.fillTriangle(CONTACT1_BUTTON_X_WIDTH + 10, CONTACTS_PG_DOWN_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, CONTACT1_BUTTON_X_WIDTH + 20, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, WHITE);
+   tft.setCursor(60, 15);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(2);
+   tft.print("ID: ");
+   uint16_t deviceID = DEVICE_ID;
+   tft.println(deviceID);
+
+   // ADD CONTACTS BUTTON
+   tft.fillCircle(ADD_CONTACT_BUTTON_X,ADD_CONTACT_BUTTON_Y, ADD_CONTACT_BUTTON_X_WIDTH,BLUE);
+   tft.setCursor(ADD_CONTACT_BUTTON_X - 8,ADD_CONTACT_BUTTON_Y-2);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("ADD");
+
+   // DELETE CONTACTS BUTTON
+   tft.fillRect(DELETE_CONTACT_BUTTON_X,DELETE_CONTACT_BUTTON_Y,DELETE_CONTACT_BUTTON_X_WIDTH,DELETE_CONTACT_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(DELETE_CONTACT_BUTTON_X + 10,DELETE_CONTACT_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("DEL");
+
+   // BUTTON-UP
+   tft.fillTriangle(CONTACT1_BUTTON_X_WIDTH + 10, CONTACT1_BUTTON_Y - 30, CONTACT1_BUTTON_X_WIDTH, CONTACT1_BUTTON_Y - 5, CONTACT1_BUTTON_X_WIDTH + 20, CONTACT1_BUTTON_Y - 5, WHITE);
+
+   // BUTTON DOWN 
+    tft.fillTriangle(CONTACT1_BUTTON_X_WIDTH + 10, CONTACTS_PG_DOWN_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, CONTACT1_BUTTON_X_WIDTH + 20, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, WHITE);
    
     requestContacts(0);
     return;

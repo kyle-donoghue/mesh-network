@@ -176,7 +176,7 @@ void receiveUART () {
             handler = READY;
             expectedSerial = 1;
             break;
-        case CONTS_REC:
+        case CONTS_REC_N1:
             for (uint8_t i = 0; i<4;i++ ) {
                 currentContactIDs[i] = 0;
                 for (uint8_t j = 0; j<4;j++) { //get byte read ID's and store in array
@@ -201,6 +201,86 @@ void receiveUART () {
         default: ;
 
     }
+    return;
+}
+
+void evaluatePipe() {
+    switch(handler) {
+        case RECEIVE_N1:
+            for (uint8_t i = 0; i < 64; i++) {
+                messageToReceive[i] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = RECEIVE_N2;
+            Serial.write(ACK); 
+            break;
+        case RECEIVE_N2:
+            for (uint8_t i = 0; i < 50; i++) {//112+2+14=128, 112+2-64=50
+                messageToReceive[i+64] = serialPipe[63-i];
+            }
+            messageReceived(messageToReceive);
+            serialCounter = 0;
+            handler = READY;
+            expectedSerial = 1;
+            Serial.write(ACK);
+            break;
+        case CONTS_REC_N1:
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[0][i] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = CONTS_REC_N2;
+            Serial.write(ACK);
+            break;
+        case CONTS_REC_N2:
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[0][i+64] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = CONTS_REC_N3;
+            Serial.write(ACK);
+            break;
+        case CONTS_REC_N3:
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[1][i] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = CONTS_REC_N4;
+            Serial.write(ACK);
+            break;
+        case CONTS_REC_N4:
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[1][i+64] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = READY;
+            expectedSerial = 1;
+            Serial.write(ACK);
+            displayContacts();
+            break;
+        case READY:
+            uint8_t handleCode = serialPipe[0];
+            serialCounter = 0;
+            handler = handleUART(handleCode);
+            Serial.write(ACK);
+            break;
+        default: ;
+
+    }
+    return;
+}
+
+void processByte() {
+    //shift right arrray for loop
+    //serial.read into [0]
+    //increase serial coutner
+    
+    for(int i = 63; i > 0; i++)
+    {
+        serialPipe[i] = serialPipe[i-1]; // right shifts data
+    }
+    serialPipe[0] = Serial.read();//reads first element
+    serialCounter++;
     return;
 }
 
@@ -259,7 +339,7 @@ void deleteContact() {//use textBuffer as ID
 void sendMessage() {//use textBuffer as ID and textBuffer2 as message
     Serial.write(MSG_SEND);
     waitForAck();
-    uint32_t ID = 0;
+    uint16_t ID = 0;
     for(uint8_t i = 0; i < 8; i++) {//8 because 8 decimal digits?
         ID += ((int) textBuffer[i])*10*(7-i); //i think this will work?
     }

@@ -8,13 +8,17 @@ void setup() {
     screenPower(1);
     pinMode(13, OUTPUT);
     //delay(2000);
-    handleScreen(MAIN_SCREEN_CODE);
+    handleScreen(CONTACTS_SCREEN_CODE);
     //setupTimers();
 }
 
 void loop() { 
-    if (Serial.available() >= expectedSerial) {
-        receiveUART();
+    if (Serial.available()) {
+        processByte();
+        if (serialCounter == expectedSerial) {
+            evaluatePipe();
+        }
+        //receiveUART();
     }
     if (prevAwake != awake) {
         screenPower(awake);
