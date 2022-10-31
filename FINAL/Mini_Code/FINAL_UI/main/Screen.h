@@ -27,14 +27,7 @@ bool isPressed(int16_t z) {
     return 0;
 }
 
-void waitForAck() {
-  while (true) { //wait for handshake
-        if (Serial.available()) {
-            uint8_t ack = Serial.read();
-            break;
-        }
-    }
-}
+
 
 uint16_t getButton(int x, int y) {
     switch(currentScreen) {
@@ -113,97 +106,6 @@ int handleUART(uint8_t handleCode) {
     }
 }
 
-void receiveUART () {
-    switch(handler) {
-        case RECEIVE_N1:
-            for (uint8_t i = 0; i < 64; i++) {
-                messageToReceive[i] = Serial.read();
-            }
-            Serial.write(ACK);
-            handler = RECEIVE_N2;
-            break;
-        case RECEIVE_N2:
-            for (uint8_t i = 64; i < 128; i++) {
-                messageToReceive[i] = Serial.read();
-            }
-            Serial.write(ACK);
-            handler = RECEIVE_N3;
-            break;
-        case RECEIVE_N3:
-            for (uint8_t i = 128; i < 192; i++) {
-                messageToReceive[i] = Serial.read();
-            }
-            Serial.write(ACK);
-            handler = RECEIVE_N4;
-            break;
-        case RECEIVE_N4:
-            for (uint8_t i = 192; i < 256; i++) {
-                messageToReceive[i] = Serial.read();
-            }
-            switch(messageHandler) { //if you get here, just know that i want to kill myself
-                case MSG_TO_ME:
-                    messageReceived(messageToReceive);
-                    messageHandler = MSG_TO_ME;
-                    handler = READY;
-                    Serial.write(ACK);
-                    break;
-                case MSG_LOG1:
-                    displayMessage(messageToReceive,1);
-                    messageHandler = MSG_LOG2;
-                    handler = RECEIVE_N1; //TO-DO: make sure messagehandler is set when requesting messages
-                    break;
-                case MSG_LOG2:
-                    displayMessage(messageToReceive,2);
-                    Serial.write(ACK);
-                    messageHandler = MSG_LOG3;
-                    handler = RECEIVE_N1;
-                    break;
-                case MSG_LOG3:
-                    displayMessage(messageToReceive,3);
-                    Serial.write(ACK);
-                    messageHandler = MSG_LOG4;
-                    handler = RECEIVE_N1;
-                    break;
-                case MSG_LOG4:
-                    displayMessage(messageToReceive,4);
-                    Serial.write(ACK);
-                    messageHandler = MSG_TO_ME;
-                    handler = RECEIVE_N1;
-                    break;
-                default: ;
-            }
-            Serial.write(ACK);
-            handler = READY;
-            expectedSerial = 1;
-            break;
-        case CONTS_REC_N1:
-            for (uint8_t i = 0; i<4;i++ ) {
-                currentContactIDs[i] = 0;
-                for (uint8_t j = 0; j<4;j++) { //get byte read ID's and store in array
-                    currentContactIDs[i] += Serial.read();
-                    if (i < 3)
-                        currentContactIDs[i] = currentContactIDs[i] << 8;
-                }
-                for (uint8_t j = 0; j<12;j++) { //get byte read characters and store in array
-                    currentContactNames[i][j] = Serial.read();
-                }
-            }
-            displayContacts();
-            handler = READY;
-            expectedSerial = 1;
-            Serial.write(ACK);
-            break;
-        case READY:
-            int handleCode = Serial.read();
-            handler = handleUART(handleCode);
-            Serial.write(ACK);
-            break;
-        default: ;
-
-    }
-    return;
-}
-
 void evaluatePipe() {
     switch(handler) {
         case RECEIVE_N1:
@@ -255,7 +157,6 @@ void evaluatePipe() {
             serialCounter = 0;
             handler = READY;
             expectedSerial = 1;
-            Serial.write(ACK);
             displayContacts();
             break;
         case READY:
@@ -275,7 +176,7 @@ void processByte() {
     //serial.read into [0]
     //increase serial coutner
     
-    for(int i = 63; i > 0; i++)
+    for(int i = 63; i > 0; i--)
     {
         serialPipe[i] = serialPipe[i-1]; // right shifts data
     }

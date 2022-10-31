@@ -51,6 +51,17 @@ uint8_t currentScreen = MAIN_SCREEN_CODE;
 uint8_t serialPipe[64] = {0};
 uint8_t serialCounter = 0;
 
+
+void waitForAck() {
+  while (true) { //wait for handshake
+        if (Serial.available()) {
+            uint8_t ack = Serial.read();
+            break;
+        }
+    }
+}
+
+
 int setupSerial() {
     //Serial.begin(BAUD_RATE, SERIAL_8E2); //8 data bits, even parity, 2 stop bits
     Serial.begin(BAUD_RATE);
@@ -59,7 +70,13 @@ int setupSerial() {
     while (true) { //wait for handshake
         if (Serial.available()) {
             uint8_t ack = Serial.read();
-            break;
+            uint8_t boot = BOOT;
+            if (ack == boot) {
+              break;
+            }
+            else {
+              Serial.write(BOOT);
+            }
         }
     }
     Serial.write(BOOT); 

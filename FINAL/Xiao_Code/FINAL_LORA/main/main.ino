@@ -9,12 +9,15 @@ void setup() {
     printTest();
     setupHMC();
     setupSerial();
+    Serial.println("xiao setup done\n");
 }
 
 void loop() {
 if (Serial1.available()) {
+    Serial.println("xiao got data from pro mini");
         processByte();
         if (serialCounter == expectedSerial) {
+            Serial.println("expected serial count was reached");
             evaluatePipe();
         }
         //receiveUART();

@@ -7,7 +7,6 @@ void setup() {
     setupSerial();
     screenPower(1);
     pinMode(13, OUTPUT);
-    //delay(2000);
     handleScreen(CONTACTS_SCREEN_CODE);
     //setupTimers();
 }
@@ -18,8 +17,8 @@ void loop() {
         if (serialCounter == expectedSerial) {
             evaluatePipe();
         }
-        //receiveUART();
     }
+    /*
     if (prevAwake != awake) {
         screenPower(awake);
         prevAwake = awake;
@@ -32,7 +31,7 @@ void loop() {
                 handleScreen(screenCode);
             }
         }
-    }
+    }*/
 
 }
 

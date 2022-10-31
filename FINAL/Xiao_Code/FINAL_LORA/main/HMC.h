@@ -38,10 +38,10 @@ uint8_t initializeContacts() { //split row into bytes to be processed
           contacts[0][j] = (ID>>((1-j)*8)) & 0xFF; //sets first 2 bytes to be the ID
       }
     for (uint8_t j = 2; j < 14; j++) {
-          contacts[0][j] = name[j-2];// sets bytes 2 - 16 as the Name 
+          contacts[0][j] = name[j-2];// sets bytes 2 - 14 as the Name 
       }
     for (uint8_t j = 14; j < 156; j++){
-          contacts[0][j] = msg[j-14]; // sets 16-156 as the msg 
+          contacts[0][j] = msg[j-14]; // sets 14-156 as the msg 
       }
 
     
@@ -126,17 +126,17 @@ uint8_t sendContacts(uint8_t firstContact) {
          for(uint8_t j = (i*64); j < ((i+1)*64); j++){
             Serial1.write(contacts[firstContact][j]);
          }
-         //Serial.println("sent chunk, waiting");
+         Serial.println("sent chunk, waiting");
         waitForAck();
-        //Serial.println("got ack");
+        Serial.println("got ack");
     }
     for (uint8_t i = 0; i < 2; i++) { //send 2 chunks of 64 bytes
         for(uint8_t j = (i*64); j < ((i+1)*64); j++){
             Serial1.write(contacts[firstContact + 1][j]);
          } 
-        //Serial.println("sent chunk, waiting.2");    
+        Serial.println("sent chunk, waiting.2");    
         waitForAck();
-        //Serial.println("got ack.2");
+        Serial.println("got ack.2");
     }
     return READY;
     //return READY;
@@ -283,7 +283,9 @@ void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a tim
 
 
 uint8_t handleUART(uint8_t handleCode) {
-    uint8_t tmp_handler = 0;
+    uint8_t tmp_handler = 1;
+    Serial.print("handling code: ");
+    Serial.println(handleCode); 
     switch(handleCode) {
         case MSG_SEND: //xiao sends message received
             tmp_handler = SEND_N1;
@@ -301,12 +303,12 @@ uint8_t handleUART(uint8_t handleCode) {
             Serial1.write(ACK);
             break;
         case REQ_CONTS:
-            //Serial.println("got req conts code");
+            Serial.println("got req conts code");
             tmp_handler = REQ_CONTS;
             expectedSerial = 1;
-            //Serial1.write(ACK);
+            Serial1.write(ACK);
             break;
-        default: ;
+        default: Serial.println("UART command did not match");
     }
     return tmp_handler;
 }
@@ -385,19 +387,19 @@ void receiveUART () {
             break;
         }
         case REQ_CONTS: {
-            uint8_t firstContact = Serial1.read();
+            uint8_t firstContact = serialPipe[0];
             handler = sendContacts(firstContact);
             expectedSerial = 1;
            break;
         }
         case MSG_DISP: {
-            uint8_t numMessage = Serial1.read();
+            uint8_t numMessage = serialPipe[0];
             handler = displayMessage(numMessage);
             expectedSerial = 1;
            break;
         }
         case READY: {
-            uint8_t handleCode = Serial1.read();
+            uint8_t handleCode = serialPipe[0];
             handler = handleUART(handleCode);
             break;
         }
@@ -407,6 +409,8 @@ void receiveUART () {
 }
 
 void evaluatePipe () {
+    Serial.print("evaluating pipe with handler=");
+    Serial.println(handler);
     switch(handler) {
         case SEND_N1: {
             for (uint8_t i = 0; i < 64; i++) {
@@ -465,18 +469,18 @@ void evaluatePipe () {
             break;
         }
         case REQ_CONTS: {
-            //Serial.print("got index ");
+            Serial.print("got index ");
             uint8_t firstContact = serialPipe[0];
-            //Serial.println(firstContact);
+            Serial.println(firstContact);
             handler = sendContacts(firstContact);
             expectedSerial = 1;
             handler = READY;
             Serial1.write(ACK);
-            //Serial.println("req conts done");
+            Serial.println("req conts done");
            break;
         }
         case READY: {
-            uint8_t handleCode = Serial1.read();
+            uint8_t handleCode = serialPipe[0];
             handler = handleUART(handleCode);
             serialCounter = 0;
             break;
@@ -493,12 +497,12 @@ void processByte() {
     //serial.read into [0]
     //increase serial coutner
     
-    for(int i = 63; i > 0; i++)
+    for(int i = 63; i > 0; i--)
     {
         serialPipe[i] = serialPipe[i-1]; // right shifts data
     }
     serialPipe[0] = Serial1.read();//reads first element
-    Serial.write(serialPipe[0]);
+    Serial.println(serialPipe[0]);
     serialCounter++;
     return;
 }
@@ -523,12 +527,24 @@ int setupSerial() {
     
 
     Serial1.write(BOOT);
+    Serial.println("xiao sent boot signal");
     while (true) { //wait for handshake
         if (Serial1.available()) {
             uint8_t ack = Serial1.read();
-            break;
+            uint8_t boot = BOOT;
+            Serial.print("xiao received boot signal: ");
+            Serial.println(ack);
+            if (ack == boot) {
+              Serial.println("it was the correct boot signal");
+              break;
+            }
+            else {
+              Serial1.write(BOOT);
+              Serial.println("it wasn't the correct boot signal, resending...");
+            }
         }
     }
     Serial1.write(BOOT);
+    Serial.println("xiao sent final boot signal");
     return 1;
 }

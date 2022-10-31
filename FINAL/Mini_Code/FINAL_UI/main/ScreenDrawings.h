@@ -22,6 +22,15 @@ void displayMessage( char message[144], uint8_t index) {
   return;
 }
 void displayContacts() {
+    
+    char str[12] = {0};
+    for (uint8_t i = 0; i < 12; i++) {
+      str[i] = currentContacts[0][i+3];
+    }
+    tft.setCursor(CONTACTS_BUTTON_X + 10,CONTACTS_BUTTON_Y + 35);
+    tft.setTextColor(WHITE);
+    tft.setTextSize(2);
+    tft.println(str);
   
 }
 
@@ -53,8 +62,11 @@ void requestMessage(uint8_t numMessage, uint8_t num) { //get the nth message
 
 void requestContacts(uint8_t firstContact) { //get 4 contacts at once
     Serial.write(REQ_CONTS);
+    waitForAck();
+    Serial.write(firstContact);
     expectedSerial = 64;
     handler = CONTS_REC_N1;
+    return;
 }
 
 void drawMainScreen() { // 2
@@ -76,8 +88,8 @@ void drawMainScreen() { // 2
 }
 
 void drawContactsScreen() { // 14
-    tft.fillScreen(BLACK);
-    
+   tft.fillScreen(BLACK);
+   /* 
     // MAIN/HOME BUTTON
    tft.fillTriangle(MAIN_BUTTON_X,MAIN_BUTTON_Y + 20,MAIN_BUTTON_X + 20,MAIN_BUTTON_Y, MAIN_BUTTON_X + 40,MAIN_BUTTON_Y+20,MAGENTA );
    tft.fillRect(MAIN_BUTTON_X + 5, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
@@ -113,7 +125,7 @@ void drawContactsScreen() { // 14
 
    // BUTTON DOWN 
     tft.fillTriangle(CONTACT1_BUTTON_X_WIDTH + 10, CONTACTS_PG_DOWN_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, CONTACT1_BUTTON_X_WIDTH + 20, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, WHITE);
-   
+   */
     requestContacts(0);
     return;
 }// end draw Contacts
