@@ -33,7 +33,7 @@ uint16_t randomID(uint16_t seed) { //TO-DO use lora random
 uint8_t initializeContacts() { //split row into bytes to be processed
     uint16_t ID = 1;
     char name[12] = "John Doe";
-    char msg[142] = "Character Counter is a 100% free online character count calculator that's simple to use. Sometimes users prefer simplicity over all of the de"; //142 characters from wordcounter.net
+    char msg[142] = "TestMessage1  Character Counter is a 100% free online character count calculator that's simple to use. Sometimes users prefer simplicity over"; //142 characters from wordcounter.net
     for (uint8_t j = 0; j < 2; j++) {
           contacts[0][j] = (ID>>((1-j)*8)) & 0xFF; //sets first 2 bytes to be the ID
       }
@@ -43,7 +43,18 @@ uint8_t initializeContacts() { //split row into bytes to be processed
     for (uint8_t j = 14; j < 156; j++){
           contacts[0][j] = msg[j-14]; // sets 14-156 as the msg 
       }
-
+    uint16_t ID1 = 2;
+    char name1[12] = "James Smith";
+    char msg1[142] = "TestMessage2  Character Counter is a 100% free online character count calculator that's simple to use. Sometimes users prefer simplicity over"; //142 characters from wordcounter.net
+    for (uint8_t j = 0; j < 2; j++) {
+          contacts[1][j] = (ID1>>((1-j)*8)) & 0xFF; //sets first 2 bytes to be the ID
+      }
+    for (uint8_t j = 2; j < 14; j++) {
+          contacts[1][j] = name1[j-2];// sets bytes 2 - 14 as the Name 
+      }
+    for (uint8_t j = 14; j < 156; j++){
+          contacts[1`][j] = msg1[j-14]; // sets 14-156 as the msg 
+      }
     
   return 0;  //Serial1.write(contacts[0],156)
 }

@@ -23,14 +23,30 @@ void displayMessage( char message[144], uint8_t index) {
 }
 void displayContacts() {
     
-    char str[12] = {0};
-    for (uint8_t i = 0; i < 12; i++) {
-      str[i] = currentContacts[0][i+3];
-    }
-    tft.setCursor(CONTACTS_BUTTON_X + 10,CONTACTS_BUTTON_Y + 35);
-    tft.setTextColor(WHITE);
+    
+
+    tft.setCursor(0, 80);
+    tft.setTextColor(RED);
     tft.setTextSize(2);
-    tft.println(str);
+    tft.println(&currentContacts[0][3]);
+
+    tft.setCursor(5, 100);
+    tft.setTextColor(GREEN);
+    tft.setTextSize(1);
+    tft.drawRect(CONTACT1_BUTTON_X,CONTACT1_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACT1_BUTTON_Y_WIDTH, WHITE);
+    tft.println(&currentContacts[0][16]);
+
+    tft.setCursor(0, 150);
+    tft.setTextColor(RED);
+    tft.setTextSize(2);
+    tft.println(&currentContacts[1][3]);
+
+    tft.setCursor(5, 170);
+    tft.setTextColor(GREEN);
+    tft.setTextSize(1);
+    tft.drawRect(CONTACT2_BUTTON_X,CONTACT2_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACT2_BUTTON_Y_WIDTH, WHITE);
+    tft.println(&currentContacts[1][16]);
+
   
 }
 
@@ -89,14 +105,14 @@ void drawMainScreen() { // 2
 
 void drawContactsScreen() { // 14
    tft.fillScreen(BLACK);
-   /* 
-    // MAIN/HOME BUTTON
+    
+    /*// MAIN/HOME BUTTON
    tft.fillTriangle(MAIN_BUTTON_X,MAIN_BUTTON_Y + 20,MAIN_BUTTON_X + 20,MAIN_BUTTON_Y, MAIN_BUTTON_X + 40,MAIN_BUTTON_Y+20,MAGENTA );
    tft.fillRect(MAIN_BUTTON_X + 5, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
    tft.setCursor(MAIN_BUTTON_X + 9,MAIN_BUTTON_Y + 30);
    tft.setTextColor(WHITE);
    tft.setTextSize(1);
-   tft.println("HOME");
+   tft.println("HOME");*/
 
     // Device ID
    tft.setCursor(60, 15);
@@ -125,7 +141,7 @@ void drawContactsScreen() { // 14
 
    // BUTTON DOWN 
     tft.fillTriangle(CONTACT1_BUTTON_X_WIDTH + 10, CONTACTS_PG_DOWN_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, CONTACT1_BUTTON_X_WIDTH + 20, CONTACTS_PG_DOWN_BUTTON_Y_WIDTH, WHITE);
-   */
+   
     requestContacts(0);
     return;
 }// end draw Contacts
