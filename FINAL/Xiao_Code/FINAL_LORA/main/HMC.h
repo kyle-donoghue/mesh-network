@@ -33,7 +33,8 @@ uint16_t randomID(uint16_t seed) { //TO-DO use lora random
 uint8_t initializeContacts() { //split row into bytes to be processed
     uint16_t ID = 1;
     char name[12] = "John Doe";
-    char msg[142] = "TestMessage1  Character Counter is a 100% free online character count calculator that's simple to use. Sometimes users prefer simplicity over"; //142 characters from wordcounter.net
+    //messages should be 114 length
+    char msg[114] = "TestMessage1  Character Counter is a 100% free online character count calculator that's simple to use. Sometimes"; //142 characters from wordcounter.net
     for (uint8_t j = 0; j < 2; j++) {
           contacts[0][j] = (ID>>((1-j)*8)) & 0xFF; //sets first 2 bytes to be the ID
       }
@@ -43,9 +44,10 @@ uint8_t initializeContacts() { //split row into bytes to be processed
     for (uint8_t j = 14; j < 156; j++){
           contacts[0][j] = msg[j-14]; // sets 14-156 as the msg 
       }
+      Serial.print(contacts[0][2]);
     uint16_t ID1 = 2;
     char name1[12] = "James Smith";
-    char msg1[142] = "TestMessage2  Character Counter is a 100% free online character count calculator that's simple to use. Sometimes users prefer simplicity over"; //142 characters from wordcounter.net
+    char msg1[142] = "TestMessage2  Character Counter is a 100% free online character count calculator that's simple to use. Sometimes"; //142 characters from wordcounter.net
     for (uint8_t j = 0; j < 2; j++) {
           contacts[1][j] = (ID1>>((1-j)*8)) & 0xFF; //sets first 2 bytes to be the ID
       }
@@ -53,7 +55,7 @@ uint8_t initializeContacts() { //split row into bytes to be processed
           contacts[1][j] = name1[j-2];// sets bytes 2 - 14 as the Name 
       }
     for (uint8_t j = 14; j < 156; j++){
-          contacts[1`][j] = msg1[j-14]; // sets 14-156 as the msg 
+          contacts[1][j] = msg1[j-14]; // sets 14-156 as the msg 
       }
     
   return 0;  //Serial1.write(contacts[0],156)
@@ -97,40 +99,13 @@ uint8_t deleteContact(uint16_t ID) {
             break;
         }
     }
-    
+    Serial.println("contact deleted");
     return READY;
-}
-
-uint8_t displayMessage(uint8_t numMessage) {
-    for (uint8_t i = 0; i < 4; i++) { //send 4 chunks of 64 bytes
-        for (uint16_t j = i*64; j < (i+1)*64; j++) {
-            if (j < 244) {
-                Serial1.write(messages[numMessage][j]); //should change to write('',n)
-            }
-            else { //if we are over the 244 byte message storage limite
-                Serial1.write((byte) 0x00);
-            }
-        }
-        waitForAck();
-    }
-    return READY;
-
 }
 
 uint8_t sendContacts(uint8_t firstContact) {
 
-    // for (uint8_t i = firstContact; i < firstContact+2;i++) {
-    //     if (i < NUM_CONTS) {
-    //         for (uint8_t j = 0; j < 156; j++) {
-    //             Serial1.write(contacts[i][j]); //should change to write('',n)
-    //         }
-    //     }
-    //     else {
-    //         for (uint8_t j = 0; j < 156; j++) {
-    //             Serial1.write((byte) 0x00);
-    //         } 
-    //     }
-    // }
+    
     for (uint8_t i = 0; i < 2; i++) { //send 2 chunks of 64 bytes
          //for j=i*64,j<(i+1)*64,i++
          //serial.write contacts[index][j]
@@ -150,7 +125,6 @@ uint8_t sendContacts(uint8_t firstContact) {
         Serial.println("got ack.2");
     }
     return READY;
-    //return READY;
 }
 
 bool messageExists(uint16_t msgID) {
@@ -298,126 +272,38 @@ uint8_t handleUART(uint8_t handleCode) {
     Serial.print("handling code: ");
     Serial.println(handleCode); 
     switch(handleCode) {
-        case MSG_SEND: //xiao sends message received
+        case MSG_SEND: { //xiao sends message received
             tmp_handler = SEND_N1;
             expectedSerial = 64;
             Serial1.write(ACK);
             break;
-        case ADD_CONT:
+        }
+        case ADD_CONT: {
+            Serial.println("got add cont code");
             tmp_handler = ADD_CONT;
             expectedSerial = 14;
             Serial1.write(ACK);
             break;
-        case DEL_CONT:
+        }
+        case DEL_CONT: {
+            Serial.println("got delete cont code");
             tmp_handler = DEL_CONT;
             expectedSerial = 2;
             Serial1.write(ACK);
             break;
-        case REQ_CONTS:
+        }
+        case REQ_CONTS: {
             Serial.println("got req conts code");
             tmp_handler = REQ_CONTS;
             expectedSerial = 1;
             Serial1.write(ACK);
             break;
-        default: Serial.println("UART command did not match");
+        }
+        default: {Serial.println("UART command did not match");}
     }
     return tmp_handler;
 }
 
-void receiveUART () {
-    switch(handler) {
-        case SEND_N1: {
-            for (uint8_t i = 0; i < 64; i++) {
-                messageToSend[i] = Serial1.read(); //need to comply with 144
-            }
-            Serial1.write(ACK);
-            handler = SEND_N2;
-            break;
-        }
-        case SEND_N2: {
-            for (uint8_t i = 64; i < 128; i++) {
-                messageToSend[i] = Serial1.read();
-            }
-            Serial1.write(ACK);
-            handler = SEND_N3;
-            break;
-        }
-        case SEND_N3: {
-            for (uint8_t i = 128; i < 192; i++) {
-                messageToSend[i] = Serial1.read();
-            }
-            Serial1.write(ACK);
-            handler = SEND_N4;
-            break;
-        }
-        case SEND_N4: {
-            for (uint8_t i = 192; i < 256; i++) {
-                messageToSend[i] = Serial1.read();
-            }
-            uint16_t N_ID = getID(messageToSend,0);
-            uint16_t M_ID = getID(messageToSend,2);
-            uint16_t R_ID = getID(messageToSend,4);
-            uint16_t S_ID = getID(messageToSend,5);
-            char message[142] = {0};
-            for (uint8_t i = 0; i < 150; i++) {
-                message[i] = messageToSend[i+8];
-            }
-            sendMessage(N_ID, M_ID, R_ID, S_ID, message);
-            Serial1.write(ACK);
-            handler = READY;
-            expectedSerial = 1;
-            break;
-        }
-        case ADD_CONT: {
-            uint16_t contactID = 0;
-            char contactName[12] = {0};
-            char tmpID[2] = {0};
-            for(uint8_t i =0;i<2;i++) //get ID
-            {
-                tmpID[i] = Serial1.read();
-            }
-            contactID = ((uint8_t)tmpID[0]<<8)|((uint8_t)tmpID[1]);
-            for(uint8_t i =0;i<14;i++) //get Name
-            {
-                contactName[i] = Serial1.read();
-            }
-            handler = addContact(contactID, contactName);
-            expectedSerial = 1;
-            break;
-        }
-        case DEL_CONT: {
-            uint16_t contactID = 0;
-            char tmpID[2] = {0};
-            for(uint8_t i =0;i<2;i++) //get ID
-            {
-                tmpID[i] = Serial1.read();
-            }
-            contactID = ((uint8_t)tmpID[0]<<8)|((uint8_t)tmpID[1]);
-            handler = deleteContact(contactID);
-            expectedSerial = 1;
-            break;
-        }
-        case REQ_CONTS: {
-            uint8_t firstContact = serialPipe[0];
-            handler = sendContacts(firstContact);
-            expectedSerial = 1;
-           break;
-        }
-        case MSG_DISP: {
-            uint8_t numMessage = serialPipe[0];
-            handler = displayMessage(numMessage);
-            expectedSerial = 1;
-           break;
-        }
-        case READY: {
-            uint8_t handleCode = serialPipe[0];
-            handler = handleUART(handleCode);
-            break;
-        }
-        default: ;
-            
-    }
-}
 
 void evaluatePipe () {
     Serial.print("evaluating pipe with handler=");
@@ -445,9 +331,10 @@ void evaluatePipe () {
                 message[i] = messageToSend[i+2];
             }
             sendMessage(N_ID, M_ID, R_ID, S_ID, message);
-            Serial1.write(ACK);
             handler = READY;
             expectedSerial = 1;
+            serialCounter = 0;
+            Serial1.write(ACK);
             break;
         }
         case ADD_CONT: {
@@ -465,18 +352,16 @@ void evaluatePipe () {
             }
             handler = addContact(contactID, contactName);
             expectedSerial = 1;
+            serialCounter = 0;
             break;
         }
         case DEL_CONT: {
-            uint16_t contactID = 0;
-            char tmpID[2] = {0};
-            for(uint8_t i =0;i<2;i++) //get ID
-            {
-                tmpID[i] = Serial1.read();
-            }
-            contactID = ((uint8_t)tmpID[0]<<8)|((uint8_t)tmpID[1]);
+            Serial.print("deleting contact with ID: ");
+            uint16_t contactID = ((uint8_t)serialPipe[1]<<8)|((uint8_t)serialPipe[0]);
+            Serial.println(contactID);
             handler = deleteContact(contactID);
             expectedSerial = 1;
+            serialCounter = 0;
             break;
         }
         case REQ_CONTS: {
@@ -485,6 +370,7 @@ void evaluatePipe () {
             Serial.println(firstContact);
             handler = sendContacts(firstContact);
             expectedSerial = 1;
+            serialCounter = 0;
             handler = READY;
             Serial1.write(ACK);
             Serial.println("req conts done");
@@ -513,7 +399,9 @@ void processByte() {
         serialPipe[i] = serialPipe[i-1]; // right shifts data
     }
     serialPipe[0] = Serial1.read();//reads first element
-    Serial.println(serialPipe[0]);
+    Serial.print(serialPipe[0]);
+    Serial.print(" with currrent expected length of: ");
+    Serial.println(expectedSerial);
     serialCounter++;
     return;
 }

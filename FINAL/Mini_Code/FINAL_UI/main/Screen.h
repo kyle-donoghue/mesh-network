@@ -108,7 +108,7 @@ int handleUART(uint8_t handleCode) {
 
 void evaluatePipe() {
     switch(handler) {
-        case RECEIVE_N1:
+        case RECEIVE_N1: {
             for (uint8_t i = 0; i < 64; i++) {
                 messageToReceive[i] = serialPipe[63-i];
             }
@@ -116,7 +116,8 @@ void evaluatePipe() {
             handler = RECEIVE_N2;
             Serial.write(ACK); 
             break;
-        case RECEIVE_N2:
+        }
+        case RECEIVE_N2: {
             for (uint8_t i = 0; i < 50; i++) {//112+2+14=128, 112+2-64=50
                 messageToReceive[i+64] = serialPipe[63-i];
             }
@@ -126,7 +127,8 @@ void evaluatePipe() {
             expectedSerial = 1;
             Serial.write(ACK);
             break;
-        case CONTS_REC_N1:
+        }
+        case CONTS_REC_N1: {
             for (uint8_t i = 0; i < 64; i++) {
                 currentContacts[0][i] = serialPipe[63-i];
             }
@@ -134,7 +136,8 @@ void evaluatePipe() {
             handler = CONTS_REC_N2;
             Serial.write(ACK);
             break;
-        case CONTS_REC_N2:
+        }
+        case CONTS_REC_N2: {
             for (uint8_t i = 0; i < 64; i++) {
                 currentContacts[0][i+64] = serialPipe[63-i];
             }
@@ -142,7 +145,8 @@ void evaluatePipe() {
             handler = CONTS_REC_N3;
             Serial.write(ACK);
             break;
-        case CONTS_REC_N3:
+        }
+        case CONTS_REC_N3: {
             for (uint8_t i = 0; i < 64; i++) {
                 currentContacts[1][i] = serialPipe[63-i];
             }
@@ -150,7 +154,8 @@ void evaluatePipe() {
             handler = CONTS_REC_N4;
             Serial.write(ACK);
             break;
-        case CONTS_REC_N4:
+        }
+        case CONTS_REC_N4: {
             for (uint8_t i = 0; i < 64; i++) {
                 currentContacts[1][i+64] = serialPipe[63-i];
             }
@@ -158,13 +163,15 @@ void evaluatePipe() {
             handler = READY;
             expectedSerial = 1;
             displayContacts();
+            Serial.write(ACK);
             break;
-        case READY:
+        }
+        case READY: {
             uint8_t handleCode = serialPipe[0];
             serialCounter = 0;
             handler = handleUART(handleCode);
-            Serial.write(ACK);
             break;
+        }
         default: ;
 
     }
@@ -183,6 +190,16 @@ void processByte() {
     serialPipe[0] = Serial.read();//reads first element
     serialCounter++;
     return;
+}
+
+void deleteContact(uint8_t ind) {
+  Serial.write(DEL_CONT);
+  waitForAck();
+  Serial.write(currentContacts[ind][0]);
+  Serial.write(currentContacts[ind][1]);
+  deleting = false;
+  drawContactsScreen();
+  return;
 }
 
 
@@ -204,6 +221,25 @@ void handleScreen( uint16_t screenCode) {
             currentScreen = screenCode;
             drawReceivedScreen();
             break;
+        case DELETE_CONTACT_SCREEN_CODE:
+            deleting = true;
+            break;
+        case CONTACT1_SCREEN_CODE:
+            if(deleting)
+              deleteContact(0);
+            else {
+              currentScreen = COMPOSE_SCREEN_CODE;
+              drawComposeScreen();
+            }
+            break;
+        case CONTACT2_SCREEN_CODE:
+            if(deleting)
+              deleteContact(1);
+            else {
+              currentScreen = COMPOSE_SCREEN_CODE;
+              drawComposeScreen();
+            }
+            break;
         default: ;
     }
     return;
@@ -224,18 +260,6 @@ void addContact() {//use textBuffer as ID and textBuffer2 as name
     }
 }
 
-void deleteContact() {//use textBuffer as ID
-    //TO-DO: make it name based with lookup ID; also on-click of contact
-    Serial.write(DEL_CONT);
-    waitForAck();
-    uint32_t ID = 0;
-    for(uint8_t i = 0; i < 8; i++) {//8 because 8 decimal digits?
-        ID += ((int) textBuffer[i])*10*(7-i); //i think this will work?
-    }
-    for (uint8_t i = 3; i >= 0;i++) {
-        Serial.write((ID >> (8*i)) & 0xFF); //write each byte of ID to xiao
-    }
-}
 
 void sendMessage() {//use textBuffer as ID and textBuffer2 as message
     Serial.write(MSG_SEND);

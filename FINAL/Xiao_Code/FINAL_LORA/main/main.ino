@@ -2,7 +2,7 @@
 
 void setup() {
   
-    Serial.begin(BAUD_RATE);
+    Serial.begin(9600);
     delay(5000);
     //while(!Serial);
     initializeContacts();

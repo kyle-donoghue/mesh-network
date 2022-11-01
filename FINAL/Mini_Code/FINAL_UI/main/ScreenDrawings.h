@@ -28,24 +28,24 @@ void displayContacts() {
     tft.setCursor(0, 80);
     tft.setTextColor(RED);
     tft.setTextSize(2);
-    tft.println(&currentContacts[0][3]);
+    tft.println(&currentContacts[0][2]);
 
-    tft.setCursor(5, 100);
+    tft.setCursor(10, 100);
     tft.setTextColor(GREEN);
     tft.setTextSize(1);
     tft.drawRect(CONTACT1_BUTTON_X,CONTACT1_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACT1_BUTTON_Y_WIDTH, WHITE);
-    tft.println(&currentContacts[0][16]);
+    tft.println(&currentContacts[0][14]);
 
     tft.setCursor(0, 150);
     tft.setTextColor(RED);
     tft.setTextSize(2);
-    tft.println(&currentContacts[1][3]);
+    tft.println(&currentContacts[1][2]);
 
-    tft.setCursor(5, 170);
+    tft.setCursor(10, 170);
     tft.setTextColor(GREEN);
     tft.setTextSize(1);
     tft.drawRect(CONTACT2_BUTTON_X,CONTACT2_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACT2_BUTTON_Y_WIDTH, WHITE);
-    tft.println(&currentContacts[1][16]);
+    tft.println(&currentContacts[1][14]);
 
   
 }
@@ -54,31 +54,14 @@ void displayContacts() {
 
 //use requestMessage and requestContacts when drawing to get data
 
-void requestMessage(uint8_t numMessage, uint8_t num) { //get the nth message
-    Serial.write(MSG_DISP);
-    expectedSerial = 64;
-    handler = RECEIVE_N1;
-    switch(num) {
-        case 1:
-            messageHandler = MSG_LOG1;
-            break;
-        case 2:
-            messageHandler = MSG_LOG2;
-            break;
-        case 3:
-            messageHandler = MSG_LOG3;
-            break;
-        case 4:
-            messageHandler = MSG_LOG4;
-            break;
-        default: ;
-    }
-    return;
-}
+
 
 void requestContacts(uint8_t firstContact) { //get 4 contacts at once
     Serial.write(REQ_CONTS);
     waitForAck();
+    if(booting)
+      waitForAck();
+    booting=false;
     Serial.write(firstContact);
     expectedSerial = 64;
     handler = CONTS_REC_N1;

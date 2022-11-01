@@ -22,7 +22,8 @@ void loop() {
     if (prevAwake != awake) {
         screenPower(awake);
         prevAwake = awake;
-    }
+    }*/
+    
     else if(awake) {
         button = getPress();
         if (isPressed(button.z)) {
@@ -31,7 +32,7 @@ void loop() {
                 handleScreen(screenCode);
             }
         }
-    }*/
+    }
 
 }
 

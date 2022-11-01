@@ -14,15 +14,15 @@ Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 //TO-DO: change to {}
 uint16_t mainScreenButtons[MAIN_SCREEN_BUTTON_COUNT][5] =          {{CONTACTS_SCREEN_CODE,          CONTACTS_BUTTON_X,          CONTACTS_BUTTON_Y,          CONTACTS_BUTTON_X_WIDTH,            CONTACTS_BUTTON_Y_WIDTH},
                                                                     {LOG_SCREEN_CODE,               LOG_BUTTON_X,               LOG_BUTTON_Y,               LOG_BUTTON_X_WIDTH,                 LOG_BUTTON_Y_WIDTH}};
-uint16_t contactsScreenButtons[CONTACTS_SCREEN_BUTTON_COUNT][5] =  {{MAIN_SCREEN_CODE,              MAIN_BUTTON_X,              MAIN_BUTTON_Y,              MAIN_BUTTON_X_WIDTH,                MAIN_BUTTON_Y_WIDTH},
+uint16_t contactsScreenButtons[CONTACTS_SCREEN_BUTTON_COUNT][5] =  {/*{MAIN_SCREEN_CODE,              MAIN_BUTTON_X,              MAIN_BUTTON_Y,              MAIN_BUTTON_X_WIDTH,                MAIN_BUTTON_Y_WIDTH},*/
                                                                     {ADD_CONTACT_SCREEN_CODE,       ADD_CONTACT_BUTTON_X,       ADD_CONTACT_BUTTON_Y,       ADD_CONTACT_BUTTON_X_WIDTH,         ADD_CONTACT_BUTTON_Y_WIDTH},
                                                                     {DELETE_CONTACT_SCREEN_CODE,    DELETE_CONTACT_BUTTON_X,    DELETE_CONTACT_BUTTON_Y,    DELETE_CONTACT_BUTTON_X_WIDTH,      DELETE_CONTACT_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_DOWN_SCREEN_CODE,  CONTACTS_PG_DOWN_BUTTON_X,  CONTACTS_PG_DOWN_BUTTON_Y,  CONTACTS_PG_DOWN_BUTTON_X_WIDTH,    CONTACTS_PG_DOWN_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_UP_SCREEN_CODE,    CONTACTS_PG_UP_BUTTON_X,    CONTACTS_PG_UP_BUTTON_Y,    CONTACTS_PG_UP_BUTTON_X_WIDTH,      CONTACTS_PG_UP_BUTTON_Y_WIDTH},
                                                                     {CONTACT1_SCREEN_CODE,          CONTACT1_BUTTON_X,          CONTACT1_BUTTON_Y,          CONTACT1_BUTTON_X_WIDTH,            CONTACT1_BUTTON_Y_WIDTH},
-                                                                    {CONTACT2_SCREEN_CODE,          CONTACT2_BUTTON_X,          CONTACT2_BUTTON_Y,          CONTACT2_BUTTON_X_WIDTH,            CONTACT2_BUTTON_Y_WIDTH},
+                                                                    {CONTACT2_SCREEN_CODE,          CONTACT2_BUTTON_X,          CONTACT2_BUTTON_Y,          CONTACT2_BUTTON_X_WIDTH,            CONTACT2_BUTTON_Y_WIDTH}/*,
                                                                     {CONTACT3_SCREEN_CODE,          CONTACT3_BUTTON_X,          CONTACT3_BUTTON_Y,          CONTACT3_BUTTON_X_WIDTH,            CONTACT3_BUTTON_Y_WIDTH},
-                                                                    {CONTACT4_SCREEN_CODE,          CONTACT4_BUTTON_X,          CONTACT4_BUTTON_Y,          CONTACT4_BUTTON_X_WIDTH,            CONTACT4_BUTTON_Y_WIDTH}};
+                                                                    {CONTACT4_SCREEN_CODE,          CONTACT4_BUTTON_X,          CONTACT4_BUTTON_Y,          CONTACT4_BUTTON_X_WIDTH,            CONTACT4_BUTTON_Y_WIDTH}*/};
 uint16_t logScreenButtons[LOG_SCREEN_BUTTON_COUNT][5] =            {{MAIN_SCREEN_CODE,              MAIN_BUTTON_X,              MAIN_BUTTON_Y,              MAIN_BUTTON_X_WIDTH,                MAIN_BUTTON_Y_WIDTH},
                                                                     {LOG_PG_DOWN_SCREEN_CODE,       LOG_PG_DOWN_BUTTON_X,       LOG_PG_DOWN_BUTTON_Y,       LOG_PG_DOWN_BUTTON_X_WIDTH,         LOG_PG_DOWN_BUTTON_Y_WIDTH},
                                                                     {LOG_PG_UP_SCREEN_CODE,         LOG_PG_UP_BUTTON_X,         LOG_PG_UP_BUTTON_Y,         LOG_PG_UP_BUTTON_X_WIDTH,           LOG_PG_UP_BUTTON_Y_WIDTH}};
@@ -51,6 +51,8 @@ uint8_t currentScreen = MAIN_SCREEN_CODE;
 uint8_t serialPipe[64] = {0};
 uint8_t serialCounter = 0;
 
+bool deleting = false;
+bool booting = true;
 
 void waitForAck() {
   while (true) { //wait for handshake
