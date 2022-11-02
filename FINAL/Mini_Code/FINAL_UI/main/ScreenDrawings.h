@@ -130,25 +130,38 @@ void drawContactsScreen() { // 14
 }// end draw Contacts
 
 
-void drawComposeScreen() { //
-   
+void drawComposeScreen(uint8_t ind) { //
+  currContactIndex = ind;
+   cursorCords[0] = CURSOR_X;
+    cursorCords[1] = CURSOR_Y;
+    textBufferLength=0;
     tft.fillScreen(BLACK);
 
     //MSG WINDOW: SCREEN SI (20 --> 90)
     tft.fillRect(0,30,320,60,WHITE);
-    tft.setCursor(80,0);
+    tft.setCursor(40,10);
     tft.setTextColor(WHITE);
     tft.setTextSize(2);
     tft.println("To: ");
+    tft.setCursor(80,10);
+    tft.println(&currentContacts[ind][2]);
 
     // BACK TO CONTACTS BUTTON //
-    tft.fillTriangle(0,10,20,0,20,20,BLUE); // TODO --> MAKE DEFINES
+    tft.fillTriangle(CONTACTS_BUTTON_X,CONTACTS_BUTTON_Y_WIDTH/4,CONTACTS_BUTTON_X_WIDTH/2,CONTACTS_BUTTON_X/2,CONTACTS_BUTTON_X_WIDTH/2,CONTACTS_BUTTON_Y_WIDTH/2,BLUE); // TODO --> MAKE DEFINES
 
     //SEND BUTTON //
-    tft.fillTriangle(320,10,300,0,300,20,GREEN);
-
-    // BACKSPACE BUTTON //
-    tft.fillTriangle(260,10,280,0,280,20,RED);
+   tft.fillRect(SEND_BUTTON_X,SEND_BUTTON_Y,SEND_BUTTON_X_WIDTH,SEND_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(SEND_BUTTON_X + 10,SEND_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("SEND");
+   
+   // DELETE BUTTON
+   tft.fillRect(DELETE_BUTTON_X,DELETE_BUTTON_Y,DELETE_BUTTON_X_WIDTH,DELETE_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(DELETE_BUTTON_X + 10,DELETE_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("DEL");
     
     
 
@@ -169,7 +182,7 @@ void drawComposeScreen() { //
 
 
     // KEYBOARD SECTION: KEYBOARD(90 --> 240)
-    tft.fillRect(KEY_X, KEY_Y, KEY_XWIDTH, KEY_YWIDTH,YELLOW );
+    tft.fillRect(KEYBOARD_BUTTON_X, KEYBOARD_BUTTON_Y, KEYBOARD_BUTTON_X_WIDTH, KEYBOARD_BUTTON_Y_WIDTH,YELLOW );
     //tft.fillRect(10, 120, 300, 190,BLACK );
     tft.drawFastHLine(0,90,320,BLACK);
     tft.drawFastHLine(0,140,320,BLACK);
@@ -194,8 +207,11 @@ void drawComposeScreen() { //
         tft.println(row[i][j]);
       }      
     }
-    
-    
+
+    /*tft.setCursor(0,30);
+    tft.println("G");
+    tft.setCursor(15,30);
+    tft.println("G");*/
 
 }
 

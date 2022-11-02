@@ -26,11 +26,19 @@ void loop() {
     
     else if(awake) {
         button = getPress();
-        if (isPressed(button.z)) {
+        if (isPressed(button.z) && !pressing && (holdCount > 100)) {
+            holdCount = 0;
+            pressing = true;
             screenCode = getButton(button.x, button.y);
             if (screenCode) {
                 handleScreen(screenCode);
             }
+            delay(25);
+        }
+        else if (!isPressed(button.z)) {
+          if (holdCount <= 100)
+            holdCount++;
+          pressing = false;
         }
     }
 

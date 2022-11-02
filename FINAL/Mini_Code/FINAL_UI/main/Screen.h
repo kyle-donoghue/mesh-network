@@ -27,7 +27,19 @@ bool isPressed(int16_t z) {
     return 0;
 }
 
-
+void deleteChar() {
+  if (textBufferLength == 0)
+    return;
+  if (cursorCords[0]-CURSOR_XWIDTH < 20) {
+    cursorCords[0] = CURSOR_X+30*CURSOR_XWIDTH;
+    cursorCords[1] = cursorCords[1]-CURSOR_YWIDTH;
+  }
+  else
+    cursorCords[0] = cursorCords[0]-CURSOR_XWIDTH;
+  tft.fillRect(cursorCords[0]*2,cursorCords[1]*2,CURSOR_XWIDTH*2,CURSOR_YWIDTH*2-2, WHITE);
+  textBuffer[textBufferLength] = '\0';
+  textBufferLength--;
+}
 
 uint16_t getButton(int x, int y) {
     switch(currentScreen) {
@@ -75,6 +87,25 @@ uint16_t getButton(int x, int y) {
                 }
                 if( !((y >= composeScreenButtons[i][2]) && (y <= composeScreenButtons[i][2]+composeScreenButtons[i][4])) ){ // if y matches, then go to contacts/logs
                     continue;
+                }
+                if (composeScreenButtons[i][0] == KEYBOARD_SCREEN_CODE) {
+                  if (textBufferLength <= TEXT_BUFFER_MAX) {
+                    uint16_t x_hat = x;
+                    uint16_t y_hat = y - KEYBOARD_BUTTON_Y;
+                    uint8_t ix = x_hat / KEY_XWIDTH;
+                    uint8_t iy = y_hat / KEY_YWIDTH;
+                    tft.setCursor(cursorCords[0]*2,cursorCords[1]*2);
+                    tft.setTextSize(1);
+                    tft.println(row[iy][ix] == '_' ? ' ' : row[iy][ix]);
+                    textBuffer[textBufferLength] = row[iy][ix] == '_' ? ' ' : row[iy][ix];
+                    if (cursorCords[0]+CURSOR_XWIDTH > 136) {
+                      cursorCords[0] = CURSOR_X;
+                      cursorCords[1] = cursorCords[1]+CURSOR_YWIDTH;
+                    }
+                    else
+                      cursorCords[0] = cursorCords[0]+CURSOR_XWIDTH;
+                    textBufferLength++;
+                  }
                 }
                 return composeScreenButtons[i][0];
             }
@@ -178,6 +209,25 @@ void evaluatePipe() {
     return;
 }
 
+void sendMessage() {//use textBuffer as ID and textBuffer2 as message
+    Serial.write(MSG_SEND);
+    waitForAck();
+    uint16_t R_ID = ((uint8_t)currentContacts[currContactIndex][0]<<8)|((uint8_t)currentContacts[currContactIndex][1]);
+    char totalMessage[128] = {0};
+    for (uint8_t i = 0; i < 2;i++) {
+      totalMessage[i] = currentContacts[currContactIndex][i];
+    }
+    for (uint8_t i = 2; i < 128; i++) {
+      totalMessage[i] = textBuffer[i-2];
+    }
+    
+    for (uint8_t i = 0; i < 2; i++) { //send 2 chunks of 64 bytes
+        for (uint8_t j = i*64; j < (i+1)*64; j++) {
+                Serial.write(totalMessage[j]);
+        }
+        waitForAck();
+    }
+}
 void processByte() {
     //shift right arrray for loop
     //serial.read into [0]
@@ -215,7 +265,7 @@ void handleScreen( uint16_t screenCode) {
             break;
         case COMPOSE_SCREEN_CODE:
             currentScreen = screenCode;
-            drawComposeScreen();
+            drawComposeScreen(0);
             break;
         case RECEIVED_SCREEN_CODE:
             currentScreen = screenCode;
@@ -229,7 +279,7 @@ void handleScreen( uint16_t screenCode) {
               deleteContact(0);
             else {
               currentScreen = COMPOSE_SCREEN_CODE;
-              drawComposeScreen();
+              drawComposeScreen(0);
             }
             break;
         case CONTACT2_SCREEN_CODE:
@@ -237,9 +287,13 @@ void handleScreen( uint16_t screenCode) {
               deleteContact(1);
             else {
               currentScreen = COMPOSE_SCREEN_CODE;
-              drawComposeScreen();
+              drawComposeScreen(1);
             }
             break;
+        case DELETE_SCREEN_CODE:
+            deleteChar();
+        case SEND_SCREEN_CODE:
+            sendMessage();
         default: ;
     }
     return;
@@ -255,38 +309,10 @@ void addContact() {//use textBuffer as ID and textBuffer2 as name
     for (uint8_t i = 3; i >= 0;i++) {
         Serial.write((ID >> (8*i)) & 0xFF); //write each byte of ID to xiao
     }
-    for (uint8_t i = 0; i < 12;i++) {
-        Serial.write(textBuffer2[i]); //write first 12 bytes of textBuffer2 to xiao
-    }
 }
 
 
-void sendMessage() {//use textBuffer as ID and textBuffer2 as message
-    Serial.write(MSG_SEND);
-    waitForAck();
-    uint16_t ID = 0;
-    for(uint8_t i = 0; i < 8; i++) {//8 because 8 decimal digits?
-        ID += ((int) textBuffer[i])*10*(7-i); //i think this will work?
-    }
-    char tmpMessage[144] = {0};
-    for (uint8_t i = 0; i >= 0;i++) {
-        tmpMessage[i] = ((ID >> (8*i)) & 0xFF); //write each byte of ID to first 4 bytes of tmpMSG
-    }
-    for (uint8_t i = 0; i < 240; i++) {
-        tmpMessage[i+4] = textBuffer2[i]; //write message to tmp message
-    }
-    for (uint8_t i = 0; i < 4; i++) { //send 4 chunks of 64 bytes
-        for (uint16_t j = i*64; j < (i+1)*64; j++) {
-            if (j < 144) {
-                Serial.write(tmpMessage[j]);
-            }
-            else { //if we are over the 244 byte message storage limite
-                Serial.write(0);
-            }
-        }
-        waitForAck();
-    }
-}
+
 
 /*
 void addToTextBuffer(char press, uint8_t buffer) { //on key press add characer to buffer

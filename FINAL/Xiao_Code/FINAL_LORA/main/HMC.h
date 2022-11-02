@@ -273,6 +273,7 @@ uint8_t handleUART(uint8_t handleCode) {
     Serial.println(handleCode); 
     switch(handleCode) {
         case MSG_SEND: { //xiao sends message received
+            Serial.print("got send request");
             tmp_handler = SEND_N1;
             expectedSerial = 64;
             Serial1.write(ACK);
@@ -313,6 +314,7 @@ void evaluatePipe () {
             for (uint8_t i = 0; i < 64; i++) {
                 messageToSend[i] = serialPipe[63-i]; //need to comply with 144
             }
+            Serial.print("got first chunk");
             serialCounter = 0;
             handler = SEND_N2;
             Serial1.write(ACK);
@@ -322,15 +324,25 @@ void evaluatePipe () {
             for (uint8_t i = 0; i < 50; i++) {
                 messageToSend[i+64] = serialPipe[63-i];
             }
-            uint16_t N_ID = NETWORK_ID;
+             Serial.print("got second chunk");
+           uint16_t N_ID = NETWORK_ID;
             uint16_t M_ID = 1354;//TO-DO: this
-            uint16_t R_ID = getID(messageToSend,4);
+            uint16_t R_ID = getID(messageToSend,0);
             uint16_t S_ID = DEVICE_ID;
-            char message[112] = {0};
-            for (uint8_t i = 0; i < 112; i++) {
+            char message[114] = {0};
+            for (uint8_t i = 0; i < 114; i++) {
                 message[i] = messageToSend[i+2];
             }
-            sendMessage(N_ID, M_ID, R_ID, S_ID, message);
+            Serial.print("N_ID: ");
+            Serial.println(N_ID);
+            Serial.print("M_ID: ");
+            Serial.println(N_ID);
+            Serial.print("R_ID: ");
+            Serial.println(R_ID);
+            Serial.print("S_ID: ");
+            Serial.println(S_ID);
+            Serial.println(message);
+            //sendMessage(N_ID, M_ID, R_ID, S_ID, message);
             handler = READY;
             expectedSerial = 1;
             serialCounter = 0;
