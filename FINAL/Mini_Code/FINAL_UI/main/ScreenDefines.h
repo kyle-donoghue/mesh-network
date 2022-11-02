@@ -121,6 +121,15 @@
 #define CONTACT4_BUTTON_Y_WIDTH 37
 /****************************/
 
+// COMPOSE BUTTONS //
+
+
+
+//// KEYBOARD PARAMETERS ////
+#define KEY_X 0
+#define KEY_Y 90
+#define KEY_XWIDTH 320
+#define KEY_YWIDTH 150
 
 
 //// LOGS SCREEN DEFINES ////

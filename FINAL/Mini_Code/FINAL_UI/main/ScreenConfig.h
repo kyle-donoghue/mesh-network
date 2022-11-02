@@ -32,6 +32,9 @@ uint16_t receivedScreenButtons[RECEIVED_SCREEN_BUTTON_COUNT][5] =         {{MAIN
                                                                     {COMPOSE_SCREEN_CODE,           COMPOSE_BUTTON_X,           COMPOSE_BUTTON_Y,           COMPOSE_BUTTON_X_WIDTH,             COMPOSE_BUTTON_Y_WIDTH}};
 
 uint16_t keyboardButtons[5] =                                       {}; //runtime dispersion
+char row[3][10] = {{'Q','W','E','R','T','Y','U','I','O','P'},
+                   {'A','S','D','F','G','H','J','K','L',';'},
+                   {'Z','X','C','V','B','N','M',',','.','\''}}; 
 
 uint8_t handler = READY;
 uint8_t messageHandler = MSG_TO_ME;

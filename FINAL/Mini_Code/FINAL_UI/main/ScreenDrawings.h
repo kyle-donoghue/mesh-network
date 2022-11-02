@@ -33,7 +33,7 @@ void displayContacts() {
     tft.setCursor(10, 100);
     tft.setTextColor(GREEN);
     tft.setTextSize(1);
-    tft.drawRect(CONTACT1_BUTTON_X,CONTACT1_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACT1_BUTTON_Y_WIDTH, WHITE);
+    tft.drawRect(CONTACT1_BUTTON_X-5,CONTACT1_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH+50, CONTACT1_BUTTON_Y_WIDTH, WHITE);
     tft.println(&currentContacts[0][14]);
 
     tft.setCursor(0, 150);
@@ -44,7 +44,7 @@ void displayContacts() {
     tft.setCursor(10, 170);
     tft.setTextColor(GREEN);
     tft.setTextSize(1);
-    tft.drawRect(CONTACT2_BUTTON_X,CONTACT2_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH, CONTACT2_BUTTON_Y_WIDTH, WHITE);
+    tft.drawRect(CONTACT2_BUTTON_X-5,CONTACT2_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH+50, CONTACT2_BUTTON_Y_WIDTH, WHITE);
     tft.println(&currentContacts[1][14]);
 
   
@@ -134,40 +134,69 @@ void drawComposeScreen() { //
    
     tft.fillScreen(BLACK);
 
-    //MSG WINDOW
-    tft.fillRect(0,0,320,100,WHITE);
-    tft.setCursor(10,10);
-    tft.setTextColor(BLACK);
+    //MSG WINDOW: SCREEN SI (20 --> 90)
+    tft.fillRect(0,30,320,60,WHITE);
+    tft.setCursor(80,0);
+    tft.setTextColor(WHITE);
     tft.setTextSize(2);
     tft.println("To: ");
 
-    //MAIN/HOME BUTTON
-    tft.fillTriangle(MAIN_BUTTON_X + 300,MAIN_BUTTON_Y,MAIN_BUTTON_X + 280,MAIN_BUTTON_Y + 20, MAIN_BUTTON_X + 320,MAIN_BUTTON_Y+20,MAGENTA );
-    tft.fillRect(MAIN_BUTTON_X + 285, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
-    tft.setCursor(MAIN_BUTTON_X + 290,MAIN_BUTTON_Y + 30);
-    tft.setTextColor(WHITE);
-    tft.setTextSize(1);
-    tft.println("HOME");
+    // BACK TO CONTACTS BUTTON //
+    tft.fillTriangle(0,10,20,0,20,20,BLUE); // TODO --> MAKE DEFINES
 
-    //SEND BUTTON 
-    tft.fillRect(SEND_BUTTON_X,SEND_BUTTON_Y, SEND_BUTTON_X_WIDTH,SEND_BUTTON_Y_WIDTH,CYAN);
-    tft.setCursor(SEND_BUTTON_X,SEND_BUTTON_Y);
-    tft.setTextColor(BLACK);
-    tft.setTextSize(2);
-    tft.println("Send");
+    //SEND BUTTON //
+    tft.fillTriangle(320,10,300,0,300,20,GREEN);
+
+    // BACKSPACE BUTTON //
+    tft.fillTriangle(260,10,280,0,280,20,RED);
+    
+    
+
+//    //MAIN/HOME BUTTON
+//    tft.fillTriangle(MAIN_BUTTON_X + 300,MAIN_BUTTON_Y,MAIN_BUTTON_X + 280,MAIN_BUTTON_Y + 20, MAIN_BUTTON_X + 320,MAIN_BUTTON_Y+20,MAGENTA );
+//    tft.fillRect(MAIN_BUTTON_X + 285, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
+//    tft.setCursor(MAIN_BUTTON_X + 290,MAIN_BUTTON_Y + 30);
+//    tft.setTextColor(WHITE);
+//    tft.setTextSize(1);
+//    tft.println("HOME");
+//
+//    //SEND BUTTON 
+//    tft.fillRect(SEND_BUTTON_X,SEND_BUTTON_Y, SEND_BUTTON_X_WIDTH,SEND_BUTTON_Y_WIDTH,CYAN);
+//    tft.setCursor(SEND_BUTTON_X,SEND_BUTTON_Y);
+//    tft.setTextColor(BLACK);
+//    tft.setTextSize(2);
+//    tft.println("Send");
 
 
-    // KEYBOARD SECTION
-    tft.fillRect(0, 110, 320, 240,YELLOW );
-    tft.fillRect(10, 120, 300, 190,BLACK );
-    tft.setCursor(20,130);
-    tft.setTextColor(WHITE);
-    tft.setTextSize(3);
-    tft.println("QWERTYUIOP");
-    tft.setCursor(20,160);
-    tft.println("ASDFGHJKL;'");
-    tft.setCursor(20,190);
-    tft.println("ZXCVBNM,.");
+    // KEYBOARD SECTION: KEYBOARD(90 --> 240)
+    tft.fillRect(KEY_X, KEY_Y, KEY_XWIDTH, KEY_YWIDTH,YELLOW );
+    //tft.fillRect(10, 120, 300, 190,BLACK );
+    tft.drawFastHLine(0,90,320,BLACK);
+    tft.drawFastHLine(0,140,320,BLACK);
+    tft.drawFastHLine(0,190,320,BLACK);
+    
+    tft.drawFastVLine(32,90,150,BLACK);
+    tft.drawFastVLine(64,90,150,BLACK);
+    tft.drawFastVLine(96,90,150,BLACK);
+    tft.drawFastVLine(128,90,150,BLACK);
+    tft.drawFastVLine(160,90,150,BLACK);
+    tft.drawFastVLine(192,90,150,BLACK);
+    tft.drawFastVLine(224,90,150,BLACK);
+    tft.drawFastVLine(256,90,150,BLACK);
+    tft.drawFastVLine(288,90,150,BLACK);
+
+    // DISPLAYS KEYBOARD CHARACTERS
+    for(uint8_t i = 0; i < 3; i++){
+      for(uint8_t j = 0; j < 10; j++){
+        tft.setCursor(j*32+8,90+i*50+12);
+        tft.setTextSize(3);
+        tft.setTextColor(BLACK);
+        tft.println(row[i][j]);
+      }      
+    }
+    
+    
+
 }
 
 void drawReceivedScreen() { // 

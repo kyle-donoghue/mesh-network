@@ -14,7 +14,7 @@ void setup() {
     digitalWrite(LED_BUILTIN,LOW);
     while (1);
   }
-  LoRa.setTxPower(20);
+  LoRa.setTxPower(17);
 
 }
 
