@@ -54,6 +54,7 @@ uint8_t cursorCords[2] = {CURSOR_X,CURSOR_Y};
 uint16_t currentContactIDs[4] = {0}; //can hold 4 contacts at a time
 char currentContactNames[4][14] = {0};
 char currentContacts[2][128] = {0};
+char currentMessage[128] = {'\0'};
 uint8_t currentScreen = MAIN_SCREEN_CODE;
 
 uint8_t serialPipe[64] = {0};

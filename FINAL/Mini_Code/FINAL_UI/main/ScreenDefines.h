@@ -171,12 +171,12 @@
 */
 
 // Bottom right, 40 x 80 pixels
-#define SEND_BUTTON_X 260
+#define SEND_BUTTON_X 270
 #define SEND_BUTTON_Y 5
 #define SEND_BUTTON_X_WIDTH 40
 #define SEND_BUTTON_Y_WIDTH 20
 
-#define DELETE_BUTTON_X 200
+#define DELETE_BUTTON_X 230
 #define DELETE_BUTTON_Y 5
 #define DELETE_BUTTON_X_WIDTH 40
 #define DELETE_BUTTON_Y_WIDTH 20

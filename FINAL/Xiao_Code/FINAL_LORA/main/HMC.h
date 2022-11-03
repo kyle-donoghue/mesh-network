@@ -8,10 +8,10 @@
 
 
 
-char messages[NUM_MSG][144] = {""}; // \0 //messages[0][0] = message1;
+//char messages[NUM_MSG][144] = {""}; // \0 //messages[0][0] = message1;
 uint16_t logs[NUM_LOG] = {0};
-char contacts[NUM_CONTS][156] = {0};// 100x156 array where each row is split into [ID(0-1),NAME(1-14).MSG(14-156)]
-char messageToDisplay[144] = {0};
+char contacts[NUM_CONTS][128] = {0};// 100x156 array where each row is split into [ID(0-1),NAME(1-14).MSG(14-156)]
+char messageToDisplay[128] = {0};
 uint8_t handler = READY;
 uint8_t expectedSerial = 1; //1 for waiting for code or ack; 64 for most other cases
 char messageToSend[150] = {0};
@@ -59,6 +59,15 @@ uint8_t initializeContacts() { //split row into bytes to be processed
       }
     
   return 0;  //Serial1.write(contacts[0],156)
+}
+
+uint8_t searchContact(uint16_t ID) {
+  for (uint8_t i = 0; i < NUM_CONTS;i++) {
+    uint16_t currID = ((uint8_t)contacts[i][0]<<8)|((uint8_t)contacts[i][1]);
+    if (currID == ID)
+      return i;
+  }
+  return NUM_CONTS;
 }
 
 uint8_t addContact(uint16_t ID, char name[14]) {
@@ -169,7 +178,7 @@ void sendMessage(uint16_t N_ID,uint16_t M_ID,uint16_t R_ID,uint16_t S_ID,char ms
     for (int i = 1; i >= 0;i--) {
         LoRa.write((S_ID >> (8*i)) & 0xFF);
     }
-    for (int i = 0; i < 142;i--) {
+    for (int i = 0; i < 114;i++) {
         LoRa.write(msg[i]); //need to do randomID
     }
     LoRa.endPacket();
@@ -177,12 +186,15 @@ void sendMessage(uint16_t N_ID,uint16_t M_ID,uint16_t R_ID,uint16_t S_ID,char ms
     return;
 }
 
-void writeMessage(char messageToSend[144]) {
+void writeMessage(char messageToSend[]) {
     Serial1.write(MESSAGE_REC); //send message received and wait for acknowledgement
     waitForAck();
-    for (uint8_t i = 0; i < 3; i++) { //send 4 chunks of 64 bytes
+    for (uint8_t i = 0; i < 2; i++) { //send 4 chunks of 64 bytes
         for (uint16_t j = i*64; j < (i+1)*64; j++) {
-            Serial1.write(messageToSend[j]); //need to make 144 comply
+            if (j >= 114)
+              Serial.write('\0');
+            else
+              Serial1.write(messageToSend[j]); //need to make 144 comply
         }
         waitForAck();
     }
@@ -191,65 +203,66 @@ void writeMessage(char messageToSend[144]) {
 
 void handleMessage(uint16_t S_ID, char msg[])
 {
-    //store message
-    for(uint8_t i = 0; i < NUM_MSG; i++) {
-        if (messages[i][1] == 0) { //first byte of sender ID is blank
-            for (uint8_t j = 0; j < 2; j++) {
-                messages[i][j] = (S_ID>>((1-j)*8)) & 0xFF; 
-            }
-            for (uint8_t j = 2; j < 144; j++) {
-                messages[i][j] = msg[j-2];
-            }
-            return;
-        }
-    }
-    //if messages are full
-    for (uint8_t i = 1; i < NUM_MSG; i++) {
-        for (uint8_t j = 0; j < 244; j++) {
-            messages[i-1][j] = messages[i][j];
-        }
-    }
-    //store message at last row
-    for (uint8_t j = 0; j < 2; j++) {
-        messages[NUM_MSG-1][j] = (S_ID>>((1-j)*8)) & 0xFF; 
-    }
-    for (uint8_t j = 2; j < 144; j++) {
-        messages[NUM_MSG-1][j] = msg[j-2];
-    }
-
+    //TO-DO: store message in contacts array
+    
+    
     //send message to pro mini
     for (uint8_t j = 0; j < 2; j++) {
         messageToDisplay[j] = (S_ID>>((1-j)*8)) & 0xFF; 
     }
-    for (uint8_t j = 2; j < 144; j++) {
-        messageToDisplay[j] = msg[j-2];
+    uint8_t ind = searchContact(S_ID);
+    if (ind == NUM_CONTS) {
+      char unknown[12] = "Unknown ID";
+      for (uint8_t j = 2; j < 14; j++) {
+        messageToDisplay[j] = unknown[j-2];
+      }
     }
-    writeMessage(messageToDisplay);
+    else {
+      for (uint8_t j = 2; j < 14; j++) {
+          messageToDisplay[j] = contacts[ind][j-2];
+      }
+    }
+    for (uint8_t j = 14; j < 128; j++) {
+        messageToDisplay[j] = msg[j-14];
+    }
 
+    writeMessage(messageToDisplay);//this is probably borken
     return;
 }
 
 
 void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a time
-    
-    if(packetSize == 0) return;
-    char messageTot[142] = {0};
-    char rawPacket[150] = {0};
-    for (uint8_t i = 0; i < 150; i++) {
+    Serial.println("got a message!");
+    char messageTot[114] = {0};
+    char rawPacket[122] = {0};
+    for (uint8_t i = 0; i < 122; i++) {
         rawPacket[i] = LoRa.read();
     }
+
     uint16_t senderTot = getID(rawPacket, 0);
     uint16_t msgIdTot = getID(rawPacket, 2);
     uint16_t recipientTot = getID(rawPacket, 4);
     uint16_t networkTot = getID(rawPacket, 6);
-    for (uint8_t i = 0; i < 142; i++) {
+
+    for (uint8_t i = 0; i < 114; i++) {
         messageTot[i] = rawPacket[i+8];
     }
-    //at this part we have 4 bytes for N_ID/M_ID/R_ID/S_ID
-    //and 142 bytes for message :)
+
+    Serial.print("R_ID: ");
+    Serial.println(recipientTot);
+    Serial.print("N_ID: ");
+    Serial.println(networkTot);
+    Serial.print("S_ID: ");
+    Serial.println(senderTot);
+    Serial.print("M_ID: ");
+    Serial.println(msgIdTot);
+    Serial.println(messageTot);
+    //at this part we have 8 bytes for N_ID/M_ID/R_ID/S_ID
+    //and 114 bytes for message :)
     uint16_t networkID = NETWORK_ID;
     uint16_t deviceID = DEVICE_ID;
-    if(networkTot != networkID) //if the network is not ours leave the function
+    
+    /*if(networkTot != networkID) //if the network is not ours leave the function
         return;
     if(messageExists(msgIdTot)) //if the message is in our memory leave the function
         return;
@@ -260,9 +273,9 @@ void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a tim
     if(recipientTot != deviceID)
         sendMessage(networkTot,msgIdTot,recipientTot,senderTot,messageTot); // if the message is not for us rebroadcast with all the stuff we have
     else
-    {
+    {*/
         handleMessage(senderTot,messageTot); // if the message is for us we want to save the sender ID and the message contents
-    }
+    //}
     return;
 }
 
@@ -273,7 +286,7 @@ uint8_t handleUART(uint8_t handleCode) {
     Serial.println(handleCode); 
     switch(handleCode) {
         case MSG_SEND: { //xiao sends message received
-            Serial.print("got send request");
+            Serial.println("got send request");
             tmp_handler = SEND_N1;
             expectedSerial = 64;
             Serial1.write(ACK);
@@ -314,7 +327,7 @@ void evaluatePipe () {
             for (uint8_t i = 0; i < 64; i++) {
                 messageToSend[i] = serialPipe[63-i]; //need to comply with 144
             }
-            Serial.print("got first chunk");
+            Serial.println("got first chunk");
             serialCounter = 0;
             handler = SEND_N2;
             Serial1.write(ACK);
@@ -324,7 +337,7 @@ void evaluatePipe () {
             for (uint8_t i = 0; i < 50; i++) {
                 messageToSend[i+64] = serialPipe[63-i];
             }
-             Serial.print("got second chunk");
+             Serial.println("got second chunk");
            uint16_t N_ID = NETWORK_ID;
             uint16_t M_ID = 1354;//TO-DO: this
             uint16_t R_ID = getID(messageToSend,0);
@@ -342,7 +355,7 @@ void evaluatePipe () {
             Serial.print("S_ID: ");
             Serial.println(S_ID);
             Serial.println(message);
-            //sendMessage(N_ID, M_ID, R_ID, S_ID, message);
+            sendMessage(N_ID, M_ID, R_ID, S_ID, message);
             handler = READY;
             expectedSerial = 1;
             serialCounter = 0;
@@ -411,9 +424,9 @@ void processByte() {
         serialPipe[i] = serialPipe[i-1]; // right shifts data
     }
     serialPipe[0] = Serial1.read();//reads first element
-    Serial.print(serialPipe[0]);
-    Serial.print(" with currrent expected length of: ");
-    Serial.println(expectedSerial);
+    //Serial.print(serialPipe[0]);
+    //Serial.print(" with currrent expected length of: ");
+    //Serial.println(expectedSerial);
     serialCounter++;
     return;
 }

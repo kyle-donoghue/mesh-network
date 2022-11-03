@@ -27,7 +27,7 @@ bool isPressed(int16_t z) {
     return 0;
 }
 
-void deleteChar() {
+void deleteChar() { //TO-DO: fix left shift begeinning delete
   if (textBufferLength == 0)
     return;
   if (cursorCords[0]-CURSOR_XWIDTH < 20) {
@@ -137,78 +137,6 @@ int handleUART(uint8_t handleCode) {
     }
 }
 
-void evaluatePipe() {
-    switch(handler) {
-        case RECEIVE_N1: {
-            for (uint8_t i = 0; i < 64; i++) {
-                messageToReceive[i] = serialPipe[63-i];
-            }
-            serialCounter = 0;
-            handler = RECEIVE_N2;
-            Serial.write(ACK); 
-            break;
-        }
-        case RECEIVE_N2: {
-            for (uint8_t i = 0; i < 50; i++) {//112+2+14=128, 112+2-64=50
-                messageToReceive[i+64] = serialPipe[63-i];
-            }
-            messageReceived(messageToReceive);
-            serialCounter = 0;
-            handler = READY;
-            expectedSerial = 1;
-            Serial.write(ACK);
-            break;
-        }
-        case CONTS_REC_N1: {
-            for (uint8_t i = 0; i < 64; i++) {
-                currentContacts[0][i] = serialPipe[63-i];
-            }
-            serialCounter = 0;
-            handler = CONTS_REC_N2;
-            Serial.write(ACK);
-            break;
-        }
-        case CONTS_REC_N2: {
-            for (uint8_t i = 0; i < 64; i++) {
-                currentContacts[0][i+64] = serialPipe[63-i];
-            }
-            serialCounter = 0;
-            handler = CONTS_REC_N3;
-            Serial.write(ACK);
-            break;
-        }
-        case CONTS_REC_N3: {
-            for (uint8_t i = 0; i < 64; i++) {
-                currentContacts[1][i] = serialPipe[63-i];
-            }
-            serialCounter = 0;
-            handler = CONTS_REC_N4;
-            Serial.write(ACK);
-            break;
-        }
-        case CONTS_REC_N4: {
-            for (uint8_t i = 0; i < 64; i++) {
-                currentContacts[1][i+64] = serialPipe[63-i];
-            }
-            serialCounter = 0;
-            handler = READY;
-            expectedSerial = 1;
-            displayContacts();
-            Serial.write(ACK);
-            break;
-        }
-        case READY: {
-            uint8_t handleCode = serialPipe[0];
-            serialCounter = 0;
-            handler = handleUART(handleCode);
-            break;
-        }
-        default: ;
-
-    }
-    return;
-}
-
 void sendMessage() {//use textBuffer as ID and textBuffer2 as message
     Serial.write(MSG_SEND);
     waitForAck();
@@ -292,9 +220,84 @@ void handleScreen( uint16_t screenCode) {
             break;
         case DELETE_SCREEN_CODE:
             deleteChar();
+            break;
         case SEND_SCREEN_CODE:
             sendMessage();
+            handleScreen(CONTACTS_SCREEN_CODE);
         default: ;
+    }
+    return;
+}
+
+void evaluatePipe() {
+    switch(handler) {
+        case RECEIVE_N1: {
+            for (uint8_t i = 0; i < 64; i++) {
+                currentMessage[i] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = RECEIVE_N2;
+            Serial.write(ACK); 
+            break;
+        }
+        case RECEIVE_N2: {
+            for (uint8_t i = 0; i < 50; i++) {//112+2+14=128, 112+2-64=50
+                currentMessage[i+64] = serialPipe[63-i];
+            }
+            messageReceived(messageToReceive);
+            serialCounter = 0;
+            handler = READY;
+            expectedSerial = 1;
+            Serial.write(ACK);
+            handleScreen(RECEIVED_SCREEN_CODE);
+            break;
+        }
+        case CONTS_REC_N1: {
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[0][i] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = CONTS_REC_N2;
+            Serial.write(ACK);
+            break;
+        }
+        case CONTS_REC_N2: {
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[0][i+64] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = CONTS_REC_N3;
+            Serial.write(ACK);
+            break;
+        }
+        case CONTS_REC_N3: {
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[1][i] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = CONTS_REC_N4;
+            Serial.write(ACK);
+            break;
+        }
+        case CONTS_REC_N4: {
+            for (uint8_t i = 0; i < 64; i++) {
+                currentContacts[1][i+64] = serialPipe[63-i];
+            }
+            serialCounter = 0;
+            handler = READY;
+            expectedSerial = 1;
+            displayContacts();
+            Serial.write(ACK);
+            break;
+        }
+        case READY: {
+            uint8_t handleCode = serialPipe[0];
+            serialCounter = 0;
+            handler = handleUART(handleCode);
+            break;
+        }
+        default: ;
+
     }
     return;
 }

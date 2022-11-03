@@ -131,6 +131,9 @@ void drawContactsScreen() { // 14
 
 
 void drawComposeScreen(uint8_t ind) { //
+  for (uint8_t i = 0; i < 114; i++) {
+    textBuffer[i] = '\0';
+  }
   currContactIndex = ind;
    cursorCords[0] = CURSOR_X;
     cursorCords[1] = CURSOR_Y;
@@ -150,7 +153,7 @@ void drawComposeScreen(uint8_t ind) { //
     tft.fillTriangle(CONTACTS_BUTTON_X,CONTACTS_BUTTON_Y_WIDTH/4,CONTACTS_BUTTON_X_WIDTH/2,CONTACTS_BUTTON_X/2,CONTACTS_BUTTON_X_WIDTH/2,CONTACTS_BUTTON_Y_WIDTH/2,BLUE); // TODO --> MAKE DEFINES
 
     //SEND BUTTON //
-   tft.fillRect(SEND_BUTTON_X,SEND_BUTTON_Y,SEND_BUTTON_X_WIDTH,SEND_BUTTON_Y_WIDTH,RED );
+   tft.fillRect(SEND_BUTTON_X,SEND_BUTTON_Y,SEND_BUTTON_X_WIDTH,SEND_BUTTON_Y_WIDTH,GREEN );
    tft.setCursor(SEND_BUTTON_X + 10,SEND_BUTTON_Y + 5);
    tft.setTextColor(WHITE);
    tft.setTextSize(1);
@@ -236,14 +239,21 @@ void drawReceivedScreen() { //
     tft.setCursor(0, 70);
     tft.setTextColor(RED);
     tft.setTextSize(3);
-    tft.println("Chase");
+    tft.println(&currentMessage[2]);
 
-    tft.setCursor(5, 110);
+    tft.setCursor(0, 100);
+    tft.setTextColor(GREEN);
+    tft.setTextSize(2);
+    tft.println(currentMessage[14]);
+
+    
+
+    /*tft.setCursor(5, 110);
     tft.setTextColor(GREEN);
     tft.setTextSize(2);
     tft.drawRect(COMPOSE_BUTTON_X,COMPOSE_BUTTON_Y, COMPOSE_BUTTON_X_WIDTH, COMPOSE_BUTTON_Y_WIDTH, WHITE);
     tft.setCursor(250, 10);
     tft.setTextColor(BLUE);
     tft.setTextSize(2);
-    tft.println("Reply");
+    tft.println("Reply");*/
 }

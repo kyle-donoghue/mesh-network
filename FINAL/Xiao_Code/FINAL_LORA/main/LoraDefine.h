@@ -47,4 +47,4 @@
 //Memory Allocation
 #define NUM_MSG 100 
 #define NUM_LOG 100
-#define NUM_CONTS 100
+#define NUM_CONTS 20

@@ -14,7 +14,7 @@ void setup() {
 
 void loop() {
 if (Serial1.available()) {
-    Serial.println("xiao got data from pro mini");
+    //Serial.println("xiao got data from pro mini");
         processByte();
         if (serialCounter == expectedSerial) {
             Serial.println("expected serial count was reached");
