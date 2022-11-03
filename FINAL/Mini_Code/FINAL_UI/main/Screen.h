@@ -126,15 +126,18 @@ uint16_t getButton(int x, int y) {
     }
     return 0;
 }
-int handleUART(uint8_t handleCode) {
+uint8_t handleUART(uint8_t handleCode) {
+    uint8_t tmp_handler = READY;
     switch(handleCode) {
         case MESSAGE_REC: //xiao sends message received
-            handler = RECEIVE_N1;
+            tmp_handler = RECEIVE_N1;
             expectedSerial = 64;
             Serial.write(ACK);
+            Serial.flush();
             break;
         default: ;
     }
+    return tmp_handler;
 }
 
 void sendMessage() {//use textBuffer as ID and textBuffer2 as message
@@ -166,6 +169,12 @@ void processByte() {
         serialPipe[i] = serialPipe[i-1]; // right shifts data
     }
     serialPipe[0] = Serial.read();//reads first element
+    if (currentScreen == COMPOSE_SCREEN_CODE) {
+      tft.setCursor(30, 50);
+    tft.setTextColor(BLACK);
+    tft.setTextSize(2);
+    tft.println(serialPipe[0]);
+    }
     serialCounter++;
     return;
 }
@@ -292,8 +301,8 @@ void evaluatePipe() {
         }
         case READY: {
             uint8_t handleCode = serialPipe[0];
-            serialCounter = 0;
             handler = handleUART(handleCode);
+            serialCounter = 0;
             break;
         }
         default: ;

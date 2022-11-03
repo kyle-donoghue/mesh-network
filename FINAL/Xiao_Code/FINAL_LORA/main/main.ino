@@ -13,7 +13,9 @@ void setup() {
 }
 
 void loop() {
-if (Serial1.available()) {
+  if (handlingMessage)
+      parseMessage();
+  else if (Serial1.available()) {
     //Serial.println("xiao got data from pro mini");
         processByte();
         if (serialCounter == expectedSerial) {

@@ -30,8 +30,7 @@ uint16_t composeScreenButtons[COMPOSE_SCREEN_BUTTON_COUNT][5] =    {{CONTACTS_SC
                                                                     {SEND_SCREEN_CODE,              SEND_BUTTON_X,              SEND_BUTTON_Y,              SEND_BUTTON_X_WIDTH,                SEND_BUTTON_Y_WIDTH},
                                                                     {DELETE_SCREEN_CODE,              DELETE_BUTTON_X,              DELETE_BUTTON_Y,              DELETE_BUTTON_X_WIDTH,                DELETE_BUTTON_Y_WIDTH},
                                                                     {KEYBOARD_SCREEN_CODE,              KEYBOARD_BUTTON_X,              KEYBOARD_BUTTON_Y,              KEYBOARD_BUTTON_X_WIDTH,                KEYBOARD_BUTTON_Y_WIDTH}};
-uint16_t receivedScreenButtons[RECEIVED_SCREEN_BUTTON_COUNT][5] =         {{MAIN_SCREEN_CODE,              MAIN_BUTTON_X,              MAIN_BUTTON_Y,              MAIN_BUTTON_X_WIDTH,                MAIN_BUTTON_Y_WIDTH},
-                                                                    {COMPOSE_SCREEN_CODE,           COMPOSE_BUTTON_X,           COMPOSE_BUTTON_Y,           COMPOSE_BUTTON_X_WIDTH,             COMPOSE_BUTTON_Y_WIDTH}};
+uint16_t receivedScreenButtons[RECEIVED_SCREEN_BUTTON_COUNT][5] =         {{CONTACTS_SCREEN_CODE,          CONTACTS_BUTTON_X,          CONTACTS_BUTTON_Y,          CONTACTS_BUTTON_X_WIDTH,            CONTACTS_BUTTON_Y_WIDTH}};
 
 uint16_t keyboardButtons[5] =                                       {}; //runtime dispersion
 char row[3][10] = {{'Q','W','E','R','T','Y','U','I','O','P'},

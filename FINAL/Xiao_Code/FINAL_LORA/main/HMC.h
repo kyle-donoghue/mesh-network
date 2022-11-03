@@ -15,9 +15,12 @@ char messageToDisplay[128] = {0};
 uint8_t handler = READY;
 uint8_t expectedSerial = 1; //1 for waiting for code or ack; 64 for most other cases
 char messageToSend[150] = {0};
+    char rawPacket[122] = {0};
 
 uint8_t serialPipe[64] = {0};
 uint8_t serialCounter = 0;
+
+bool handlingMessage = false;
 
 void printTest(){
   //Serial.write(contacts[0],156);
@@ -88,8 +91,11 @@ uint8_t addContact(uint16_t ID, char name[14]) {
 }
 
 void waitForAck() {
+    Serial1.flush();
+    delay(10);
     while(true) {
         if (Serial1.available()) {
+          
             uint8_t ack = Serial1.read();
             break;
         }
@@ -186,15 +192,17 @@ void sendMessage(uint16_t N_ID,uint16_t M_ID,uint16_t R_ID,uint16_t S_ID,char ms
     return;
 }
 
-void writeMessage(char messageToSend[]) {
+void writeMessage() {
     Serial1.write(MESSAGE_REC); //send message received and wait for acknowledgement
+
     waitForAck();
+    Serial.println("got past ack!");
     for (uint8_t i = 0; i < 2; i++) { //send 4 chunks of 64 bytes
         for (uint16_t j = i*64; j < (i+1)*64; j++) {
             if (j >= 114)
-              Serial.write('\0');
+              Serial1.write('\0');
             else
-              Serial1.write(messageToSend[j]); //need to make 144 comply
+              Serial1.write(messageToDisplay[j]); //need to make 144 comply
         }
         waitForAck();
     }
@@ -204,6 +212,7 @@ void writeMessage(char messageToSend[]) {
 void handleMessage(uint16_t S_ID, char msg[])
 {
     //TO-DO: store message in contacts array
+
     
     
     //send message to pro mini
@@ -226,24 +235,17 @@ void handleMessage(uint16_t S_ID, char msg[])
         messageToDisplay[j] = msg[j-14];
     }
 
-    writeMessage(messageToDisplay);//this is probably borken
     return;
 }
 
-
-void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a time
+void parseMessage() {
+    handlingMessage = false;
     Serial.println("got a message!");
-    char messageTot[114] = {0};
-    char rawPacket[122] = {0};
-    for (uint8_t i = 0; i < 122; i++) {
-        rawPacket[i] = LoRa.read();
-    }
-
-    uint16_t senderTot = getID(rawPacket, 0);
+   uint16_t senderTot = getID(rawPacket, 0);
     uint16_t msgIdTot = getID(rawPacket, 2);
     uint16_t recipientTot = getID(rawPacket, 4);
     uint16_t networkTot = getID(rawPacket, 6);
-
+    char messageTot[114] = {0};
     for (uint8_t i = 0; i < 114; i++) {
         messageTot[i] = rawPacket[i+8];
     }
@@ -261,7 +263,19 @@ void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a tim
     //and 114 bytes for message :)
     uint16_t networkID = NETWORK_ID;
     uint16_t deviceID = DEVICE_ID;
-    
+    /*Serial1.write(MESSAGE_REC); //send message received and wait for acknowledgement
+    Serial1.flush();
+    delay(500);*/
+    handleMessage(senderTot,messageTot); // if the message is for us we want to save the sender ID and the message contents
+    writeMessage();//this is probably borken
+}
+void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a time
+    handlingMessage = true;
+    for (uint8_t i = 0; i < 122; i++) {
+        rawPacket[i] = LoRa.read();
+    }
+
+   
     /*if(networkTot != networkID) //if the network is not ours leave the function
         return;
     if(messageExists(msgIdTot)) //if the message is in our memory leave the function
@@ -274,14 +288,15 @@ void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a tim
         sendMessage(networkTot,msgIdTot,recipientTot,senderTot,messageTot); // if the message is not for us rebroadcast with all the stuff we have
     else
     {*/
-        handleMessage(senderTot,messageTot); // if the message is for us we want to save the sender ID and the message contents
+    
+
     //}
     return;
 }
 
 
 uint8_t handleUART(uint8_t handleCode) {
-    uint8_t tmp_handler = 1;
+    uint8_t tmp_handler = READY;
     Serial.print("handling code: ");
     Serial.println(handleCode); 
     switch(handleCode) {
@@ -312,6 +327,11 @@ uint8_t handleUART(uint8_t handleCode) {
             expectedSerial = 1;
             Serial1.write(ACK);
             break;
+        }
+        case ACK: {
+          if (handlingMessage) {
+            Serial.println("got ack from msg_rec");
+          }
         }
         default: {Serial.println("UART command did not match");}
     }
@@ -424,9 +444,9 @@ void processByte() {
         serialPipe[i] = serialPipe[i-1]; // right shifts data
     }
     serialPipe[0] = Serial1.read();//reads first element
-    //Serial.print(serialPipe[0]);
-    //Serial.print(" with currrent expected length of: ");
-    //Serial.println(expectedSerial);
+    Serial.print(serialPipe[0]);
+    Serial.print(" with currrent expected length of: ");
+    Serial.println(expectedSerial);
     serialCounter++;
     return;
 }

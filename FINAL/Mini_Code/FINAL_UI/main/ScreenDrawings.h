@@ -23,7 +23,7 @@ void displayMessage( char message[144], uint8_t index) {
 }
 void displayContacts() {
     
-    
+
 
     tft.setCursor(0, 80);
     tft.setTextColor(RED);
@@ -88,7 +88,19 @@ void drawMainScreen() { // 2
 
 void drawContactsScreen() { // 14
    tft.fillScreen(BLACK);
-    
+        tft.setCursor(0, 50);
+    tft.setTextColor(GREEN);
+    tft.setTextSize(2);
+    tft.println(handler);
+
+    tft.setCursor(30, 50);
+    tft.setTextColor(GREEN);
+    tft.setTextSize(2);
+    tft.println(expectedSerial);
+    tft.setCursor(60, 50);
+    tft.setTextColor(GREEN);
+    tft.setTextSize(2);
+    tft.println(serialCounter);
     /*// MAIN/HOME BUTTON
    tft.fillTriangle(MAIN_BUTTON_X,MAIN_BUTTON_Y + 20,MAIN_BUTTON_X + 20,MAIN_BUTTON_Y, MAIN_BUTTON_X + 40,MAIN_BUTTON_Y+20,MAGENTA );
    tft.fillRect(MAIN_BUTTON_X + 5, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
@@ -222,19 +234,16 @@ void drawReceivedScreen() { //
 
   // RECEIVED MESSAGES
     tft.fillScreen(BLACK);
+    
     tft.setCursor(60, 15);
     tft.setTextColor(WHITE);
     tft.setTextSize(2);
-    tft.println("New Messages");
-    tft.drawFastHLine(60, 30, 140, WHITE);
+    tft.println("New Message!");
+    //tft.drawFastHLine(60, 30, 140, WHITE);
 
      // BACK BUTTON
-    tft.fillTriangle(MAIN_BUTTON_X,MAIN_BUTTON_Y + 20,MAIN_BUTTON_X + 40,MAIN_BUTTON_Y + 10, MAIN_BUTTON_X,MAIN_BUTTON_Y+30,WHITE );
-//    tft.fillRect(MAIN_BUTTON_X + 5, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
-//    tft.setCursor(MAIN_BUTTON_X + 9,MAIN_BUTTON_Y + 30);
-//    tft.setTextColor(WHITE);
-//    tft.setTextSize(1);
-//    tft.println("HOME");
+    //tft.fillTriangle(CONTACTS_BUTTON_X,CONTACTS_BUTTON_Y + 20,MAIN_BUTTON_X + 40,MAIN_BUTTON_Y + 10, MAIN_BUTTON_X,MAIN_BUTTON_Y+30,WHITE );
+
 
     tft.setCursor(0, 70);
     tft.setTextColor(RED);
@@ -244,16 +253,6 @@ void drawReceivedScreen() { //
     tft.setCursor(0, 100);
     tft.setTextColor(GREEN);
     tft.setTextSize(2);
-    tft.println(currentMessage[14]);
+    tft.println(&currentMessage[14]);
 
-    
-
-    /*tft.setCursor(5, 110);
-    tft.setTextColor(GREEN);
-    tft.setTextSize(2);
-    tft.drawRect(COMPOSE_BUTTON_X,COMPOSE_BUTTON_Y, COMPOSE_BUTTON_X_WIDTH, COMPOSE_BUTTON_Y_WIDTH, WHITE);
-    tft.setCursor(250, 10);
-    tft.setTextColor(BLUE);
-    tft.setTextSize(2);
-    tft.println("Reply");*/
 }

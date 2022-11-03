@@ -13,6 +13,7 @@ void setup() {
 
 void loop() { 
     if (Serial.available()) {
+        
         processByte();
         if (serialCounter == expectedSerial) {
             evaluatePipe();
