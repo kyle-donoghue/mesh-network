@@ -4,6 +4,7 @@
 #include <SPI.h>
 #include "LoraDefine.h"
 #include <LoRa.h>
+#include <time.h>
 
 
 
@@ -27,10 +28,14 @@ void printTest(){
   return;
 }
 
-uint16_t randomID(uint16_t seed) { //TO-DO use lora random
-    srand(seed);
-    uint16_t num = rand();
-    return num;
+uint16_t randomGen() {
+  uint8_t seed1 = LoRa.random();
+  uint8_t seed2 = LoRa.random();
+  seed1 += millis();
+  seed2 += DEVICE_ID;
+  uint16_t seed = ((uint8_t)seed1<<8)|((uint8_t)seed2);
+
+  return seed;
 }
 
 uint8_t initializeContacts() { //split row into bytes to be processed
@@ -143,18 +148,26 @@ uint8_t sendContacts(uint8_t firstContact) {
 }
 
 bool messageExists(uint16_t msgID) {
+  // 1 means message exists
+  //check LOGS, if msgID is already in LOGS then return 1 else return 0
+  for(uint16_t point = 0; point < NUM_LOG; point++){
+    if(logs[point] == msgID){
+      return 1;//found id TRUE
+    }
+  }
   return 0;
 }
 
 
 void logMessageID(uint16_t msgID) {
-    for(int i = 0; i < NUM_LOG; i++) {
+    for(uint8_t i = 0; i < NUM_LOG; i++) {
         if (logs[i] == 0) {
             logs[i] = msgID;
             return;
         }
     }
-    for(int i = 1; i < NUM_LOG; i++) {
+    
+    for(uint8_t i = 1; i < NUM_LOG; i++) {
         logs[i-1] = logs[i];
     }
     logs[NUM_LOG-1] = msgID;
@@ -241,10 +254,10 @@ void handleMessage(uint16_t S_ID, char msg[])
 void parseMessage() {
     handlingMessage = false;
     Serial.println("got a message!");
-   uint16_t senderTot = getID(rawPacket, 0);
+   uint16_t networkTot = getID(rawPacket, 0);
     uint16_t msgIdTot = getID(rawPacket, 2);
     uint16_t recipientTot = getID(rawPacket, 4);
-    uint16_t networkTot = getID(rawPacket, 6);
+    uint16_t senderTot = getID(rawPacket, 6);
     char messageTot[114] = {0};
     for (uint8_t i = 0; i < 114; i++) {
         messageTot[i] = rawPacket[i+8];
@@ -266,8 +279,30 @@ void parseMessage() {
     /*Serial1.write(MESSAGE_REC); //send message received and wait for acknowledgement
     Serial1.flush();
     delay(500);*/
-    handleMessage(senderTot,messageTot); // if the message is for us we want to save the sender ID and the message contents
-    writeMessage();//this is probably borken
+    
+    if(networkTot != networkID) { //if the network is not ours leave the function
+        Serial.println("network ID didnt match");
+        return;
+    }
+    if(messageExists(msgIdTot)) { //if the message is in our memory leave the function
+        Serial.println("message existed in logs");
+        return;
+    }
+    else
+    {
+        Serial.println("message didnt exist in logs, logging it");
+        logMessageID(msgIdTot);//if message is new then we log the ID in memory
+    }
+    if(recipientTot != deviceID) {
+        Serial.println("we aren't the intended address... retransmitting");
+        sendMessage(networkTot,msgIdTot,recipientTot,senderTot,messageTot); // if the message is not for us rebroadcast with all the stuff we have
+    }
+    else
+    {
+      Serial.println("we are the intended adress... printing message");
+      handleMessage(senderTot,messageTot); // if the message is for us we want to save the sender ID and the message contents
+      writeMessage();//this is probably borken
+    }
 }
 void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a time
     handlingMessage = true;
@@ -276,18 +311,7 @@ void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a tim
     }
 
    
-    /*if(networkTot != networkID) //if the network is not ours leave the function
-        return;
-    if(messageExists(msgIdTot)) //if the message is in our memory leave the function
-        return;
-    else
-    {
-        logMessageID(msgIdTot);//if message is new then we log the ID in memory
-    }
-    if(recipientTot != deviceID)
-        sendMessage(networkTot,msgIdTot,recipientTot,senderTot,messageTot); // if the message is not for us rebroadcast with all the stuff we have
-    else
-    {*/
+    
     
 
     //}
@@ -359,7 +383,7 @@ void evaluatePipe () {
             }
              Serial.println("got second chunk");
            uint16_t N_ID = NETWORK_ID;
-            uint16_t M_ID = 1354;//TO-DO: this
+            uint16_t M_ID = randomGen();//TO-DO: this
             uint16_t R_ID = getID(messageToSend,0);
             uint16_t S_ID = DEVICE_ID;
             char message[114] = {0};

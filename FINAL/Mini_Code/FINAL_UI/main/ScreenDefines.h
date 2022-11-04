@@ -1,7 +1,7 @@
 #ifndef SCREENDEFINES_H_
 #define SCREENDEFINES_H_
 
-#define DEVICE_ID 3
+#define DEVICE_ID 2
 
 //Touch Screen
 #define YP A3  // must be an analog pin, use "An" notation!
