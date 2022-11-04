@@ -7,8 +7,8 @@ void setup() {
     setupSerial();
     screenPower(1);
     pinMode(13, OUTPUT);
-    handleScreen(CONTACTS_SCREEN_CODE);
-    //setupTimers();
+    handleScreen(MAIN_SCREEN_CODE);
+    setupTimers();
 }
 
 void loop() { 
@@ -19,12 +19,15 @@ void loop() {
             evaluatePipe();
         }
     }
-    /*
+    
     if (prevAwake != awake) {
+        Serial.print("screen switched to: ");
+        Serial.println(awake);
+        Serial.println(prevAwake);
         screenPower(awake);
         prevAwake = awake;
     }
-    */
+    
     else if(awake) {
         button = getPress();
         if (isPressed(button.z) && !pressing && (holdCount > 100)) {
@@ -44,9 +47,10 @@ void loop() {
     }
 
 }
-/*
+
 //no more auto asleep, just press button to sleep and wake up, poll every 500ms to reduce CPU load
 ISR(TIMER1_COMPA_vect){
+  Serial.println(analogRead(A7));
   TCNT1  = 0;                  //First, set the timer back to 0 so it resets for next interrupt
   // awake = 1 if wake button is pressed
   bool press = analogRead(A7) < 500 ? 1 : 0;
@@ -56,4 +60,4 @@ ISR(TIMER1_COMPA_vect){
     }
     prevPress = press;
   }
-}*/
+}

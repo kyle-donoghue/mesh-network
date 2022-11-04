@@ -77,7 +77,7 @@ int setupSerial() {
     //Serial.begin(BAUD_RATE, SERIAL_8E2); //8 data bits, even parity, 2 stop bits
     Serial.begin(BAUD_RATE);
     //do handshake
-    Serial.write(BOOT);
+    /*Serial.write(BOOT);
     while (true) { //wait for handshake
         if (Serial.available()) {
             uint8_t ack = Serial.read();
@@ -90,7 +90,9 @@ int setupSerial() {
             }
         }
     }
-    Serial.write(BOOT);
+    Serial.write(BOOT);*/
+    while(!Serial);
+    Serial.println("hello");
     return 1;
 }
 
