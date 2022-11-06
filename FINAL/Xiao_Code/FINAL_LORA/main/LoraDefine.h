@@ -13,6 +13,8 @@
 #define MESSAGE_REC 12
 #define MSG_DISP 13
 #define MSG_SEND 14
+#define SHUTDOWN 28
+
 //Screen Codes
 #define LOG_SCREEN_CODE 1
 #define MAIN_SCREEN_CODE 2
@@ -33,13 +35,13 @@
 
 
 //Device Properties
-#define DEVICE_ID 2; //chosen ID for this device
-#define NETWORK_ID 12345;
+#define DEVICE_ID 1 //chosen ID for this device
+#define NETWORK_ID 12345
 
 //Lora Parameters
-#define CS_PIN D3;
-#define RESET_PIN D2;
-#define IRQ_PIN D1;
+#define CS_PIN D3
+#define RESET_PIN D2
+#define IRQ_PIN D1
 
 #define BAUD_RATE 9600 
 #define CARRIER_FREQ 915E6

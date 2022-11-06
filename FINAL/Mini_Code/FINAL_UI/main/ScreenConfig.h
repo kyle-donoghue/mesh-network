@@ -17,6 +17,7 @@ uint16_t mainScreenButtons[MAIN_SCREEN_BUTTON_COUNT][5] =          {{CONTACTS_SC
 uint16_t contactsScreenButtons[CONTACTS_SCREEN_BUTTON_COUNT][5] =  {/*{MAIN_SCREEN_CODE,              MAIN_BUTTON_X,              MAIN_BUTTON_Y,              MAIN_BUTTON_X_WIDTH,                MAIN_BUTTON_Y_WIDTH},*/
                                                                     {ADD_CONTACT_SCREEN_CODE,       ADD_CONTACT_BUTTON_X,       ADD_CONTACT_BUTTON_Y,       ADD_CONTACT_BUTTON_X_WIDTH,         ADD_CONTACT_BUTTON_Y_WIDTH},
                                                                     {DELETE_CONTACT_SCREEN_CODE,    DELETE_CONTACT_BUTTON_X,    DELETE_CONTACT_BUTTON_Y,    DELETE_CONTACT_BUTTON_X_WIDTH,      DELETE_CONTACT_BUTTON_Y_WIDTH},
+                                                                    {SHUTDOWN_SCREEN_CODE,          SHUTDOWN_BUTTON_X,          SHUTDOWN_BUTTON_Y,          SHUTDOWN_BUTTON_X_WIDTH,            SHUTDOWN_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_DOWN_SCREEN_CODE,  CONTACTS_PG_DOWN_BUTTON_X,  CONTACTS_PG_DOWN_BUTTON_Y,  CONTACTS_PG_DOWN_BUTTON_X_WIDTH,    CONTACTS_PG_DOWN_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_UP_SCREEN_CODE,    CONTACTS_PG_UP_BUTTON_X,    CONTACTS_PG_UP_BUTTON_Y,    CONTACTS_PG_UP_BUTTON_X_WIDTH,      CONTACTS_PG_UP_BUTTON_Y_WIDTH},
                                                                     {CONTACT1_SCREEN_CODE,          CONTACT1_BUTTON_X,          CONTACT1_BUTTON_Y,          CONTACT1_BUTTON_X_WIDTH,            CONTACT1_BUTTON_Y_WIDTH},
@@ -30,13 +31,23 @@ uint16_t composeScreenButtons[COMPOSE_SCREEN_BUTTON_COUNT][5] =    {{CONTACTS_SC
                                                                     {SEND_SCREEN_CODE,              SEND_BUTTON_X,              SEND_BUTTON_Y,              SEND_BUTTON_X_WIDTH,                SEND_BUTTON_Y_WIDTH},
                                                                     {DELETE_SCREEN_CODE,              DELETE_BUTTON_X,              DELETE_BUTTON_Y,              DELETE_BUTTON_X_WIDTH,                DELETE_BUTTON_Y_WIDTH},
                                                                     {KEYBOARD_SCREEN_CODE,              KEYBOARD_BUTTON_X,              KEYBOARD_BUTTON_Y,              KEYBOARD_BUTTON_X_WIDTH,                KEYBOARD_BUTTON_Y_WIDTH}};
+uint16_t enterIDScreenButtons[COMPOSE_SCREEN_BUTTON_COUNT][5] =    {{CONTACTS_SCREEN_CODE,              CONTACTS_BUTTON_X,              CONTACTS_BUTTON_Y,              CONTACTS_BUTTON_X_WIDTH,                CONTACTS_BUTTON_Y_WIDTH},
+                                                                    {ENTERIDSEND_SCREEN_CODE,              SEND_BUTTON_X,              SEND_BUTTON_Y,              SEND_BUTTON_X_WIDTH,                SEND_BUTTON_Y_WIDTH},
+                                                                    {DELETE_SCREEN_CODE,              DELETE_BUTTON_X,              DELETE_BUTTON_Y,              DELETE_BUTTON_X_WIDTH,                DELETE_BUTTON_Y_WIDTH},
+                                                                    {KEYBOARDNUM_SCREEN_CODE,              KEYBOARDNUM_BUTTON_X,              KEYBOARDNUM_BUTTON_Y,              KEYBOARDNUM_BUTTON_X_WIDTH,                KEYBOARDNUM_BUTTON_Y_WIDTH}};
+uint16_t enterNameScreenButtons[COMPOSE_SCREEN_BUTTON_COUNT][5] =    {{CONTACTS_SCREEN_CODE,              CONTACTS_BUTTON_X,              CONTACTS_BUTTON_Y,              CONTACTS_BUTTON_X_WIDTH,                CONTACTS_BUTTON_Y_WIDTH},
+                                                                    {ENTERNAMESEND_SCREEN_CODE,              SEND_BUTTON_X,              SEND_BUTTON_Y,              SEND_BUTTON_X_WIDTH,                SEND_BUTTON_Y_WIDTH},
+                                                                    {DELETE_SCREEN_CODE,              DELETE_BUTTON_X,              DELETE_BUTTON_Y,              DELETE_BUTTON_X_WIDTH,                DELETE_BUTTON_Y_WIDTH},
+                                                                    {KEYBOARD_SCREEN_CODE,              KEYBOARD_BUTTON_X,              KEYBOARD_BUTTON_Y,              KEYBOARD_BUTTON_X_WIDTH,                KEYBOARD_BUTTON_Y_WIDTH}};
+
+
 uint16_t receivedScreenButtons[RECEIVED_SCREEN_BUTTON_COUNT][5] =         {{CONTACTS_SCREEN_CODE,          CONTACTS_BUTTON_X,          CONTACTS_BUTTON_Y,          CONTACTS_BUTTON_X_WIDTH,            CONTACTS_BUTTON_Y_WIDTH}};
 
 uint16_t keyboardButtons[5] =                                       {}; //runtime dispersion
 char row[3][10] = {{'Q','W','E','R','T','Y','U','I','O','P'},
                    {'A','S','D','F','G','H','J','K','L','_'},
                    {'Z','X','C','V','B','N','M',',','.','\''}}; 
-
+char rownum[10] = {'0','1','2','3','4','5','6','7','8','9'};
 uint8_t handler = READY;
 uint8_t messageHandler = MSG_TO_ME;
 uint8_t expectedSerial = 1; //1 = waiting for code or ack, 64 for most other transmissions
@@ -50,9 +61,8 @@ uint8_t textBufferLength = 0;
 
 uint8_t cursorCords[2] = {CURSOR_X,CURSOR_Y};
 
-uint16_t currentContactIDs[4] = {0}; //can hold 4 contacts at a time
-char currentContactNames[4][14] = {0};
 char currentContacts[2][128] = {0};
+uint8_t reqContactsInd = 0;
 char currentMessage[128] = {'\0'};
 uint8_t currentScreen = MAIN_SCREEN_CODE;
 
@@ -62,7 +72,8 @@ uint8_t serialCounter = 0;
 bool deleting = false;
 bool booting = true;
 
-
+uint16_t addID = 0;
+char addName[12] = {'\0'};
 void waitForAck() {
   while (true) { //wait for handshake
         if (Serial.available()) {

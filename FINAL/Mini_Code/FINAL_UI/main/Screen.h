@@ -27,18 +27,57 @@ bool isPressed(int16_t z) {
     return 0;
 }
 
-void deleteChar() { //TO-DO: fix left shift begeinning delete
-  if (textBufferLength == 0)
+void deleteChar() { 
+  if (textBufferLength == 0) //dont delete more than 0
     return;
-  if (cursorCords[0]-CURSOR_XWIDTH < 20) {
+  if (cursorCords[0]-CURSOR_XWIDTH < 15) {
     cursorCords[0] = CURSOR_X+30*CURSOR_XWIDTH;
     cursorCords[1] = cursorCords[1]-CURSOR_YWIDTH;
   }
-  else
+  else //regular delete
     cursorCords[0] = cursorCords[0]-CURSOR_XWIDTH;
   tft.fillRect(cursorCords[0]*2,cursorCords[1]*2,CURSOR_XWIDTH*2,CURSOR_YWIDTH*2-2, WHITE);
   textBuffer[textBufferLength] = '\0';
   textBufferLength--;
+}
+
+
+void typeNum(int x, int y) {
+  if (textBufferLength <= 5) {
+    uint16_t x_hat = x;
+    uint8_t ix = x_hat / KEY_XWIDTH;
+    tft.setCursor(cursorCords[0]*2,cursorCords[1]*2);
+    tft.setTextSize(1);
+    tft.println(rownum[ix]);
+    textBuffer[textBufferLength] = rownum[ix];
+    if (cursorCords[0]+CURSOR_XWIDTH > 136) {
+      cursorCords[0] = CURSOR_X;
+      cursorCords[1] = cursorCords[1]+CURSOR_YWIDTH;
+    }
+    else
+      cursorCords[0] = cursorCords[0]+CURSOR_XWIDTH;
+    textBufferLength++;
+  }
+}
+
+void typeChar(int x, int y) {
+  if (textBufferLength <= TEXT_BUFFER_MAX) {
+    uint16_t x_hat = x;
+    uint16_t y_hat = y - KEYBOARD_BUTTON_Y;
+    uint8_t ix = x_hat / KEY_XWIDTH;
+    uint8_t iy = y_hat / KEY_YWIDTH;
+    tft.setCursor(cursorCords[0]*2,cursorCords[1]*2);
+    tft.setTextSize(1);
+    tft.println(row[iy][ix] == '_' ? ' ' : row[iy][ix]);
+    textBuffer[textBufferLength] = row[iy][ix] == '_' ? ' ' : row[iy][ix];
+    if (cursorCords[0]+CURSOR_XWIDTH > 136) {
+      cursorCords[0] = CURSOR_X;
+      cursorCords[1] = cursorCords[1]+CURSOR_YWIDTH;
+    }
+    else
+      cursorCords[0] = cursorCords[0]+CURSOR_XWIDTH;
+    textBufferLength++;
+  }
 }
 
 uint16_t getButton(int x, int y) {
@@ -89,25 +128,43 @@ uint16_t getButton(int x, int y) {
                     continue;
                 }
                 if (composeScreenButtons[i][0] == KEYBOARD_SCREEN_CODE) {
-                  if (textBufferLength <= TEXT_BUFFER_MAX) {
-                    uint16_t x_hat = x;
-                    uint16_t y_hat = y - KEYBOARD_BUTTON_Y;
-                    uint8_t ix = x_hat / KEY_XWIDTH;
-                    uint8_t iy = y_hat / KEY_YWIDTH;
-                    tft.setCursor(cursorCords[0]*2,cursorCords[1]*2);
-                    tft.setTextSize(1);
-                    tft.println(row[iy][ix] == '_' ? ' ' : row[iy][ix]);
-                    textBuffer[textBufferLength] = row[iy][ix] == '_' ? ' ' : row[iy][ix];
-                    if (cursorCords[0]+CURSOR_XWIDTH > 136) {
-                      cursorCords[0] = CURSOR_X;
-                      cursorCords[1] = cursorCords[1]+CURSOR_YWIDTH;
-                    }
-                    else
-                      cursorCords[0] = cursorCords[0]+CURSOR_XWIDTH;
-                    textBufferLength++;
-                  }
+                  typeChar(x, y);
                 }
                 return composeScreenButtons[i][0];
+            }
+            return 0;
+        case ENTERNAME_SCREEN_CODE:
+            for(int i = 0; i < COMPOSE_SCREEN_BUTTON_COUNT; i++){
+
+                if( !((x >= enterNameScreenButtons[i][1]) && (x <= enterNameScreenButtons[i][1]+enterNameScreenButtons[i][3])) ){ // if x , then go to contacts/logs
+                    continue;
+                }
+                if( !((y >= enterNameScreenButtons[i][2]) && (y <= enterNameScreenButtons[i][2]+enterNameScreenButtons[i][4])) ){ // if y matches, then go to contacts/logs
+                    continue;
+                }
+                if (enterNameScreenButtons[i][0] == KEYBOARD_SCREEN_CODE) {
+                  tft.fillRect(200,50,80,40,RED);
+    tft.fillTriangle(280,30,280,110,320,70,RED);
+                  typeChar(x, y);
+                }
+                return enterNameScreenButtons[i][0];
+            }
+            return 0;
+        case ENTERID_SCREEN_CODE:
+            for(int i = 0; i < COMPOSE_SCREEN_BUTTON_COUNT; i++){
+
+                if( !((x >= enterIDScreenButtons[i][1]) && (x <= enterIDScreenButtons[i][1]+enterIDScreenButtons[i][3])) ){ // if x , then go to contacts/logs
+                    continue;
+                }
+                if( !((y >= enterIDScreenButtons[i][2]) && (y <= enterIDScreenButtons[i][2]+enterIDScreenButtons[i][4])) ){ // if y matches, then go to contacts/logs
+                    continue;
+                }
+                if (enterIDScreenButtons[i][0] == KEYBOARDNUM_SCREEN_CODE) {
+                  tft.fillRect(200,50,80,40,RED);
+    tft.fillTriangle(280,30,280,110,320,70,RED);
+                  typeChar(x, y);
+                }
+                return enterIDScreenButtons[i][0];
             }
             return 0;
         case RECEIVED_SCREEN_CODE:
@@ -121,7 +178,7 @@ uint16_t getButton(int x, int y) {
                 }
                 return receivedScreenButtons[i][0];
             }
-            return 0;
+            return 0;            
         default: ;
     }
     return 0;
@@ -189,6 +246,46 @@ void deleteContact(uint8_t ind) {
   return;
 }
 
+void getAddID() {
+  uint16_t multiplier = 1;
+  for (uint8_t i = 114; i > 0; i--) {
+    if (textBuffer[i-1] != '\0') {
+      addID += (((uint8_t)textBuffer[i])-48)*multiplier;
+      multiplier *= 10;
+    }
+  }
+}
+
+void addContact() {
+  Serial.write(ADD_CONT);
+  waitForAck();
+  for(uint8_t i = 0; i < 2; i++) {
+    Serial.write((addID>>((1-i)*8)));
+  }
+  for(uint8_t i = 0; i <11; i++) {
+    Serial.write(textBuffer[i]);
+  }
+  Serial.write('\0');
+  
+}
+
+void contactsPageChange(bool down) {
+  if (down) {
+    if (reqContactsInd+2 > NUM_CONTS-1) {
+      reqContactsInd = 0;
+    }
+    else
+      reqContactsInd += 2;
+  }
+  else {
+    if (reqContactsInd-2 < 0) {
+      reqContactsInd = NUM_CONTS-2;
+    }
+    else
+      reqContactsInd -= 2;
+  }
+  requestContacts(reqContactsInd);
+}
 
 void handleScreen( uint16_t screenCode) {
     switch(screenCode) {
@@ -233,6 +330,31 @@ void handleScreen( uint16_t screenCode) {
         case SEND_SCREEN_CODE:
             sendMessage();
             handleScreen(CONTACTS_SCREEN_CODE);
+            break;
+        case CONTACTS_PG_DOWN_SCREEN_CODE:
+            contactsPageChange(0); //page up
+            break;
+        case CONTACTS_PG_UP_SCREEN_CODE:
+            contactsPageChange(1); //page down
+            break;
+        case SHUTDOWN_SCREEN_CODE:
+            drawShutdown();
+            currentScreen = screenCode;
+            break;
+        case ENTERIDSEND_SCREEN_CODE:
+            currentScreen = ENTERNAME_SCREEN_CODE;
+            getAddID();
+            drawEnterName();
+            break;
+        case ENTERNAMESEND_SCREEN_CODE:
+            addContact();
+            handleScreen(CONTACTS_SCREEN_CODE);
+            break;
+
+        case ADD_CONTACT_SCREEN_CODE:
+            currentScreen = ENTERID_SCREEN_CODE;
+            drawEnterID();
+            break;
         default: ;
     }
     return;
@@ -311,17 +433,7 @@ void evaluatePipe() {
     return;
 }
 
-void addContact() {//use textBuffer as ID and textBuffer2 as name
-    Serial.write(ADD_CONT);
-    waitForAck();
-    uint32_t ID;
-    for(uint8_t i = 0; i < 8; i++) {//8 because 8 decimal digits?
-        ID += ((int) textBuffer[i])*10*(7-i); //i think this will work?
-    }
-    for (uint8_t i = 3; i >= 0;i++) {
-        Serial.write((ID >> (8*i)) & 0xFF); //write each byte of ID to xiao
-    }
-}
+
 
 
 

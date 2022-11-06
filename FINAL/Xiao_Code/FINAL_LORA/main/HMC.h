@@ -5,18 +5,19 @@
 #include "LoraDefine.h"
 #include <LoRa.h>
 #include <time.h>
+#include <EEPROM.h>
 
 
 
 
 //char messages[NUM_MSG][144] = {""}; // \0 //messages[0][0] = message1;
 uint16_t logs[NUM_LOG] = {0};
-char contacts[NUM_CONTS][128] = {0};// 100x156 array where each row is split into [ID(0-1),NAME(1-14).MSG(14-156)]
-char messageToDisplay[128] = {0};
+char contacts[NUM_CONTS][128] = {'\0'};// 100x156 array where each row is split into [ID(0-1),NAME(1-14).MSG(14-156)]
+char messageToDisplay[128] = {'\0'};
 uint8_t handler = READY;
 uint8_t expectedSerial = 1; //1 for waiting for code or ack; 64 for most other cases
-char messageToSend[150] = {0};
-    char rawPacket[122] = {0};
+char messageToSend[150] = {'\0'};
+    char rawPacket[122] = {'\0'};
 
 uint8_t serialPipe[64] = {0};
 uint8_t serialCounter = 0;
@@ -39,7 +40,13 @@ uint16_t randomGen() {
 }
 
 uint8_t initializeContacts() { //split row into bytes to be processed
-    uint16_t ID = 1;
+    EEPROM.begin(2048);
+  for (uint8_t i = 0; i < NUM_CONTS; i++) {
+    for (uint8_t j = 0; j < 128; j++) {
+      contacts[i][j] = EEPROM.read(128*i+j);
+    }
+  }
+    /*uint16_t ID = 1;
     char name[12] = "John Doe";
     //messages should be 114 length
     char msg[114] = "TestMessage1  Character Counter is a 100% free online character count calculator that's simple to use. Sometimes"; //142 characters from wordcounter.net
@@ -64,7 +71,7 @@ uint8_t initializeContacts() { //split row into bytes to be processed
       }
     for (uint8_t j = 14; j < 156; j++){
           contacts[1][j] = msg1[j-14]; // sets 14-156 as the msg 
-      }
+      }*/
     
   return 0;  //Serial1.write(contacts[0],156)
 }
@@ -80,12 +87,16 @@ uint8_t searchContact(uint16_t ID) {
 
 uint8_t addContact(uint16_t ID, char name[14]) {
     //store contact
+    uint8_t search = searchContact(ID);
+    if (search == NUM_CONTS)
+      return 0;
+      
     for(uint8_t i = 0; i < NUM_CONTS; i++) {
         if (contacts[i][1] == 0) { //first byte of ID is blank
             for (uint8_t j = 0; j < 2; j++) {
                 contacts[i][j] = (ID>>((1-j)*8)) & 0xFF; 
             }
-            for (uint8_t j = 2; j < 16; j++) {
+            for (uint8_t j = 2; j < 14; j++) {
                 contacts[i][j] = name[j-2];
             }
             break;
@@ -93,6 +104,15 @@ uint8_t addContact(uint16_t ID, char name[14]) {
     }
     //if contacts are full, bummer
     return READY;
+}
+
+void shutdownHMC() {
+  for (uint8_t i = 0; i < NUM_CONTS; i++) {
+    for (uint8_t j = 0; j < 128; j++) {
+      EEPROM.write(128*i+j,contacts[i][j]);
+    }
+  }
+  EEPROM.commit();
 }
 
 void waitForAck() {
@@ -224,13 +244,12 @@ void writeMessage() {
 
 void handleMessage(uint16_t S_ID, char msg[])
 {
-    //TO-DO: store message in contacts array
-
+    
     
     
     //send message to pro mini
     for (uint8_t j = 0; j < 2; j++) {
-        messageToDisplay[j] = (S_ID>>((1-j)*8)) & 0xFF; 
+        messageToDisplay[j] = (S_ID>>((1-j)*8)) & 0xFF;
     }
     uint8_t ind = searchContact(S_ID);
     if (ind == NUM_CONTS) {
@@ -241,13 +260,20 @@ void handleMessage(uint16_t S_ID, char msg[])
     }
     else {
       for (uint8_t j = 2; j < 14; j++) {
-          messageToDisplay[j] = contacts[ind][j-2];
+          messageToDisplay[j] = contacts[ind][j];
       }
     }
     for (uint8_t j = 14; j < 128; j++) {
         messageToDisplay[j] = msg[j-14];
     }
 
+    //store message with index found by search
+    if (ind != NUM_CONTS) { //contact not found, dont store
+      for (uint8_t i = 14; i < 128; i++) {
+        contacts[ind][i] = msg[i-14];
+      }
+
+    }
     return;
 }
 
@@ -357,6 +383,9 @@ uint8_t handleUART(uint8_t handleCode) {
             Serial.println("got ack from msg_rec");
           }
         }
+        case SHUTDOWN: {
+          shutdownHMC();
+        }
         default: {Serial.println("UART command did not match");}
     }
     return tmp_handler;
@@ -412,12 +441,12 @@ void evaluatePipe () {
             char tmpID[2] = {0};
             for(uint8_t i =0;i<2;i++) //get ID
             {
-                tmpID[i] = Serial1.read();
+                tmpID[i] = serialPipe[13-i];
             }
             contactID = ((uint8_t)tmpID[0]<<8)|((uint8_t)tmpID[1]);
-            for(uint8_t i =0;i<14;i++) //get Name
+            for(uint8_t i =0;i<12;i++) //get Name
             {
-                contactName[i] = Serial1.read();
+                contactName[i] = serialPipe[11-i];
             }
             handler = addContact(contactID, contactName);
             expectedSerial = 1;
