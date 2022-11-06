@@ -1,6 +1,20 @@
 void displayMessage( char message[144], uint8_t index) {
   return;
 }
+
+void requestBattery() {
+    while(!Serial.available());
+  Serial.read();
+  Serial.write(BATTERYREQ);
+  while(!Serial.available());
+  uint8_t batteryPercentage = Serial.read();
+  tft.setCursor(DELETE_CONTACT_BUTTON_X - 30,DELETE_CONTACT_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.print(batteryPercentage);
+   tft.println("%");
+}
+
 void displayContacts() {
     
     tft.fillRect(CONTACT1_BUTTON_X-5,CONTACT1_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH+50, CONTACT1_BUTTON_Y_WIDTH, BLACK);
@@ -30,7 +44,7 @@ void displayContacts() {
     tft.drawRect(CONTACT2_BUTTON_X-5,CONTACT2_BUTTON_Y, CONTACT1_BUTTON_X_WIDTH+50, CONTACT2_BUTTON_Y_WIDTH, WHITE);
     tft.println(&currentContacts[1][14]);
 
-  
+    
 }
 
 //all other screen drawings i.e. drawContactsScreen()
@@ -71,19 +85,7 @@ void drawMainScreen() { // 2
 
 void drawContactsScreen() { // 14
    tft.fillScreen(BLACK);
-        tft.setCursor(0, 50);
-    tft.setTextColor(GREEN);
-    tft.setTextSize(2);
-    tft.println(handler);
 
-    tft.setCursor(30, 50);
-    tft.setTextColor(GREEN);
-    tft.setTextSize(2);
-    tft.println(expectedSerial);
-    tft.setCursor(60, 50);
-    tft.setTextColor(GREEN);
-    tft.setTextSize(2);
-    tft.println(serialCounter);
     /*// MAIN/HOME BUTTON
    tft.fillTriangle(MAIN_BUTTON_X,MAIN_BUTTON_Y + 20,MAIN_BUTTON_X + 20,MAIN_BUTTON_Y, MAIN_BUTTON_X + 40,MAIN_BUTTON_Y+20,MAGENTA );
    tft.fillRect(MAIN_BUTTON_X + 5, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
@@ -126,6 +128,8 @@ void drawContactsScreen() { // 14
     tft.fillTriangle(CONTACTS_PG_DOWN_BUTTON_X+CONTACTS_PG_DOWN_BUTTON_X_WIDTH/2,CONTACTS_PG_DOWN_BUTTON_Y,CONTACTS_PG_DOWN_BUTTON_X,CONTACTS_PG_DOWN_BUTTON_Y,CONTACTS_PG_DOWN_BUTTON_X_WIDTH/4+CONTACTS_PG_DOWN_BUTTON_X,CONTACTS_PG_DOWN_BUTTON_Y_WIDTH/2+CONTACTS_PG_DOWN_BUTTON_Y,WHITE); // TODO --> MAKE DEFINES
     reqContactsInd = 0;
     requestContacts(reqContactsInd);
+
+    
     return;
 }// end draw Contacts
 
@@ -168,20 +172,7 @@ void drawComposeScreen(uint8_t ind) { //
     
     
 
-//    //MAIN/HOME BUTTON
-//    tft.fillTriangle(MAIN_BUTTON_X + 300,MAIN_BUTTON_Y,MAIN_BUTTON_X + 280,MAIN_BUTTON_Y + 20, MAIN_BUTTON_X + 320,MAIN_BUTTON_Y+20,MAGENTA );
-//    tft.fillRect(MAIN_BUTTON_X + 285, MAIN_BUTTON_Y + 20, MAIN_BUTTON_X_WIDTH, MAIN_BUTTON_Y_WIDTH,MAGENTA);
-//    tft.setCursor(MAIN_BUTTON_X + 290,MAIN_BUTTON_Y + 30);
-//    tft.setTextColor(WHITE);
-//    tft.setTextSize(1);
-//    tft.println("HOME");
-//
-//    //SEND BUTTON 
-//    tft.fillRect(SEND_BUTTON_X,SEND_BUTTON_Y, SEND_BUTTON_X_WIDTH,SEND_BUTTON_Y_WIDTH,CYAN);
-//    tft.setCursor(SEND_BUTTON_X,SEND_BUTTON_Y);
-//    tft.setTextColor(BLACK);
-//    tft.setTextSize(2);
-//    tft.println("Send");
+
 
 
     // KEYBOARD SECTION: KEYBOARD(90 --> 240)
@@ -251,6 +242,8 @@ void drawReceivedScreen() { //
 }
 
 void drawShutdown() {
+      Serial.write(SHUTDOWN);
+waitForAck();
   tft.fillScreen(BLACK);
    tft.setCursor(0, 140);
     tft.setTextColor(WHITE);
@@ -259,7 +252,6 @@ void drawShutdown() {
 
     tft.fillRect(200,50,80,40,RED);
     tft.fillTriangle(280,30,280,110,320,70,RED);
-    Serial.write(SHUTDOWN);
 }
 
 void drawEnterID() {

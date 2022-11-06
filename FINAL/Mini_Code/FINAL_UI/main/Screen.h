@@ -43,10 +43,12 @@ void deleteChar() {
 
 
 void typeNum(int x, int y) {
+
   if (textBufferLength <= 5) {
     uint16_t x_hat = x;
     uint8_t ix = x_hat / KEY_XWIDTH;
     tft.setCursor(cursorCords[0]*2,cursorCords[1]*2);
+    tft.setTextColor(BLACK);
     tft.setTextSize(1);
     tft.println(rownum[ix]);
     textBuffer[textBufferLength] = rownum[ix];
@@ -67,6 +69,7 @@ void typeChar(int x, int y) {
     uint8_t ix = x_hat / KEY_XWIDTH;
     uint8_t iy = y_hat / KEY_YWIDTH;
     tft.setCursor(cursorCords[0]*2,cursorCords[1]*2);
+    tft.setTextColor(BLACK);
     tft.setTextSize(1);
     tft.println(row[iy][ix] == '_' ? ' ' : row[iy][ix]);
     textBuffer[textBufferLength] = row[iy][ix] == '_' ? ' ' : row[iy][ix];
@@ -143,8 +146,6 @@ uint16_t getButton(int x, int y) {
                     continue;
                 }
                 if (enterNameScreenButtons[i][0] == KEYBOARD_SCREEN_CODE) {
-                  tft.fillRect(200,50,80,40,RED);
-    tft.fillTriangle(280,30,280,110,320,70,RED);
                   typeChar(x, y);
                 }
                 return enterNameScreenButtons[i][0];
@@ -160,9 +161,7 @@ uint16_t getButton(int x, int y) {
                     continue;
                 }
                 if (enterIDScreenButtons[i][0] == KEYBOARDNUM_SCREEN_CODE) {
-                  tft.fillRect(200,50,80,40,RED);
-    tft.fillTriangle(280,30,280,110,320,70,RED);
-                  typeChar(x, y);
+                  typeNum(x, y);
                 }
                 return enterIDScreenButtons[i][0];
             }
@@ -250,10 +249,11 @@ void getAddID() {
   uint16_t multiplier = 1;
   for (uint8_t i = 114; i > 0; i--) {
     if (textBuffer[i-1] != '\0') {
-      addID += (((uint8_t)textBuffer[i])-48)*multiplier;
+      addID += (((uint8_t)textBuffer[i-1]-48))*multiplier;
       multiplier *= 10;
     }
   }
+  
 }
 
 void addContact() {
@@ -270,7 +270,7 @@ void addContact() {
 }
 
 void contactsPageChange(bool down) {
-  if (down) {
+  if (!down) {
     if (reqContactsInd+2 > NUM_CONTS-1) {
       reqContactsInd = 0;
     }
@@ -419,6 +419,7 @@ void evaluatePipe() {
             expectedSerial = 1;
             displayContacts();
             Serial.write(ACK);
+            requestBattery();
             break;
         }
         case READY: {

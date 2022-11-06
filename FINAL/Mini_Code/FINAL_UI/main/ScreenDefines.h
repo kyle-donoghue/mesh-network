@@ -254,6 +254,7 @@
 #define CONTS_REC_N3 26
 #define CONTS_REC_N4 27
 #define SHUTDOWN 28
+#define BATTERYREQ 30
 
 //Screen Codes
 #define LOG_SCREEN_CODE 1

@@ -6,7 +6,6 @@ void setup() {
     delay(5000);
     //while(!Serial);
     initializeContacts();
-    printTest();
     setupHMC();
     setupSerial();
     Serial.println("xiao setup done\n");

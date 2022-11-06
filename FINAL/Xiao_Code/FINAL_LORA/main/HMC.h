@@ -24,10 +24,15 @@ uint8_t serialCounter = 0;
 
 bool handlingMessage = false;
 
-void printTest(){
-  //Serial.write(contacts[0],156);
-  return;
+uint8_t batteryPercentage() {
+  Serial.print("battery percentage is: ");
+  uint16_t val = analogRead(A0);
+  float battvolt = val*4.5/1024.0;
+  Serial.println(battvolt/4.5*100);
+  return (uint8_t)(battvolt/4.5*100);
 }
+
+
 
 uint16_t randomGen() {
   uint8_t seed1 = LoRa.random();
@@ -40,11 +45,19 @@ uint16_t randomGen() {
 }
 
 uint8_t initializeContacts() { //split row into bytes to be processed
-    EEPROM.begin(2048);
+  EEPROM.begin(2048);
   for (uint8_t i = 0; i < NUM_CONTS; i++) {
-    for (uint8_t j = 0; j < 128; j++) {
-      contacts[i][j] = EEPROM.read(128*i+j);
+    if (EEPROM.read(128*i+127) == '\0') {
+      for (uint8_t j = 0; j < 128; j++) {
+        contacts[i][j] = EEPROM.read(128*i+j);
+      }
     }
+    else {
+      for (uint8_t j = 0; j < 128; j++) {
+        contacts[i][j] = '\0';
+      }
+    }
+    
   }
     /*uint16_t ID = 1;
     char name[12] = "John Doe";
@@ -88,11 +101,11 @@ uint8_t searchContact(uint16_t ID) {
 uint8_t addContact(uint16_t ID, char name[14]) {
     //store contact
     uint8_t search = searchContact(ID);
-    if (search == NUM_CONTS)
-      return 0;
-      
+    if (search != NUM_CONTS)
+      return READY;
+    Serial.println("contact not found in contacts, adding");
     for(uint8_t i = 0; i < NUM_CONTS; i++) {
-        if (contacts[i][1] == 0) { //first byte of ID is blank
+        if (contacts[i][1] == '\0') { //first byte of ID is blank
             for (uint8_t j = 0; j < 2; j++) {
                 contacts[i][j] = (ID>>((1-j)*8)) & 0xFF; 
             }
@@ -382,9 +395,16 @@ uint8_t handleUART(uint8_t handleCode) {
           if (handlingMessage) {
             Serial.println("got ack from msg_rec");
           }
+          break;
         }
         case SHUTDOWN: {
           shutdownHMC();
+          Serial1.write(ACK);
+          break;
+        }
+        case BATT: {
+          Serial1.write(batteryPercentage());
+          break;
         }
         default: {Serial.println("UART command did not match");}
     }
@@ -448,6 +468,10 @@ void evaluatePipe () {
             {
                 contactName[i] = serialPipe[11-i];
             }
+            Serial.print("adding contact with ID: ");
+            Serial.print(contactID);
+            Serial.print(" and name: ");
+            Serial.println(contactName);
             handler = addContact(contactID, contactName);
             expectedSerial = 1;
             serialCounter = 0;

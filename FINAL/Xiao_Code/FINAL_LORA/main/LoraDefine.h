@@ -14,6 +14,7 @@
 #define MSG_DISP 13
 #define MSG_SEND 14
 #define SHUTDOWN 28
+#define BATT 30
 
 //Screen Codes
 #define LOG_SCREEN_CODE 1
