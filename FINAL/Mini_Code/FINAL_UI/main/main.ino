@@ -42,6 +42,7 @@ void loop() {
           pressing = false;
         }
     }
+    wakeButton();
 
 }
 /*

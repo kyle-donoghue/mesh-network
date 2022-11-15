@@ -28,8 +28,9 @@ uint8_t batteryPercentage() {
   Serial.print("battery percentage is: ");
   uint16_t val = analogRead(A0);
   float battvolt = val*4.5/1024.0;
-  Serial.println(battvolt/4.5*100);
-  return (uint8_t)(battvolt/4.5*100);
+  Serial.println((battvolt-2.7)/1.5*100);
+  Serial.println(battvolt);
+  return (uint8_t)((battvolt-2.7)/1.5*100);
 }
 
 

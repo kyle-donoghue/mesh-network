@@ -213,7 +213,6 @@ void drawReceivedScreen() { //
 
     if (!awake) {
         awake = 1;
-        prevAwake=1;
         screenPower(awake);
     }
   // RECEIVED MESSAGES

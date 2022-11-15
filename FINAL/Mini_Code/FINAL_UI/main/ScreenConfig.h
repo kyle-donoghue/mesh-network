@@ -74,6 +74,14 @@ bool booting = true;
 
 uint16_t addID = 0;
 char addName[12] = {'\0'};
+
+bool buttonState;            
+bool lastButtonState = 0;   
+
+unsigned long lastDebounceTime = 0;  
+unsigned long debounceDelay = 50; 
+
+
 void waitForAck() {
   while (true) { //wait for handshake
         if (Serial.available()) {
@@ -131,7 +139,10 @@ uint8_t screenPower(bool power) {
         digitalWrite(A5, HIGH);
         startScreen();
     }
-    else
+    else {
+        tft.fillScreen(BLACK);
+        //delay(500);
         digitalWrite(A5, LOW);
+    }
     return 1;
 }

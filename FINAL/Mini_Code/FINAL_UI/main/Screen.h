@@ -435,7 +435,26 @@ void evaluatePipe() {
 }
 
 
+bool wakeButton() {
+  bool reading = analogRead(A7) > 512 ? 0 : 1;
 
+  if (reading != lastButtonState) {
+    lastDebounceTime = millis();
+  }
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    if (reading != buttonState) {
+      buttonState = reading;
+      if (buttonState == HIGH) {
+        awake = !awake;
+        screenPower(awake);
+        handleScreen(CONTACTS_SCREEN_CODE);
+      }
+    }
+  }
+
+  lastButtonState = reading;
+}
 
 
 
