@@ -17,6 +17,7 @@ uint16_t mainScreenButtons[MAIN_SCREEN_BUTTON_COUNT][5] =          {{CONTACTS_SC
 uint16_t contactsScreenButtons[CONTACTS_SCREEN_BUTTON_COUNT][5] =  {/*{MAIN_SCREEN_CODE,              MAIN_BUTTON_X,              MAIN_BUTTON_Y,              MAIN_BUTTON_X_WIDTH,                MAIN_BUTTON_Y_WIDTH},*/
                                                                     {ADD_CONTACT_SCREEN_CODE,       ADD_CONTACT_BUTTON_X,       ADD_CONTACT_BUTTON_Y,       ADD_CONTACT_BUTTON_X_WIDTH,         ADD_CONTACT_BUTTON_Y_WIDTH},
                                                                     {DELETE_CONTACT_SCREEN_CODE,    DELETE_CONTACT_BUTTON_X,    DELETE_CONTACT_BUTTON_Y,    DELETE_CONTACT_BUTTON_X_WIDTH,      DELETE_CONTACT_BUTTON_Y_WIDTH},
+                                                                    {DEV_SCREEN_CODE,    DEV_BUTTON_X,    DEV_BUTTON_Y,    DEV_BUTTON_X_WIDTH,      DEV_BUTTON_Y_WIDTH},
                                                                     {SHUTDOWN_SCREEN_CODE,          SHUTDOWN_BUTTON_X,          SHUTDOWN_BUTTON_Y,          SHUTDOWN_BUTTON_X_WIDTH,            SHUTDOWN_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_DOWN_SCREEN_CODE,  CONTACTS_PG_DOWN_BUTTON_X,  CONTACTS_PG_DOWN_BUTTON_Y,  CONTACTS_PG_DOWN_BUTTON_X_WIDTH,    CONTACTS_PG_DOWN_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_UP_SCREEN_CODE,    CONTACTS_PG_UP_BUTTON_X,    CONTACTS_PG_UP_BUTTON_Y,    CONTACTS_PG_UP_BUTTON_X_WIDTH,      CONTACTS_PG_UP_BUTTON_Y_WIDTH},
@@ -42,6 +43,20 @@ uint16_t enterNameScreenButtons[COMPOSE_SCREEN_BUTTON_COUNT][5] =    {{CONTACTS_
 
 
 uint16_t receivedScreenButtons[RECEIVED_SCREEN_BUTTON_COUNT][5] =         {{CONTACTS_SCREEN_CODE,          CONTACTS_BUTTON_X,          CONTACTS_BUTTON_Y,          CONTACTS_BUTTON_X_WIDTH,            CONTACTS_BUTTON_Y_WIDTH}};
+
+
+uint16_t devScreenButtons[DEV_SCREEN_BUTTON_COUNT][5] =         {{BW125_SCREEN_CODE,          BW125_BUTTON_X,          BW125_BUTTON_Y,          BW125_BUTTON_X_WIDTH,            BW125_BUTTON_Y_WIDTH},
+                                                                  {BW250_SCREEN_CODE,          BW250_BUTTON_X,          BW250_BUTTON_Y,          BW250_BUTTON_X_WIDTH,            BW250_BUTTON_Y_WIDTH},
+                                                                  {BW500_SCREEN_CODE,          BW500_BUTTON_X,          BW500_BUTTON_Y,          BW500_BUTTON_X_WIDTH,            BW500_BUTTON_Y_WIDTH},
+                                                                  {SF7_SCREEN_CODE,          SF7_BUTTON_X,          SF7_BUTTON_Y,          SF7_BUTTON_X_WIDTH,            SF7_BUTTON_Y_WIDTH},
+                                                                  {SF9_SCREEN_CODE,          SF9_BUTTON_X,          SF9_BUTTON_Y,          SF9_BUTTON_X_WIDTH,            SF9_BUTTON_Y_WIDTH},
+                                                                  {SF11_SCREEN_CODE,          SF11_BUTTON_X,          SF11_BUTTON_Y,          SF11_BUTTON_X_WIDTH,            SF11_BUTTON_Y_WIDTH},
+                                                                  {CRCON_SCREEN_CODE,          CRCON_BUTTON_X,          CRCON_BUTTON_Y,          CRCON_BUTTON_X_WIDTH,            CRCON_BUTTON_Y_WIDTH},
+                                                                  {CRCOFF_SCREEN_CODE,          CRCOFF_BUTTON_X,          CRCOFF_BUTTON_Y,          CRCOFF_BUTTON_X_WIDTH,            CRCOFF_BUTTON_Y_WIDTH},
+                                                                  {AUTG_SCREEN_CODE,          AUTG_BUTTON_X,          AUTG_BUTTON_Y,          AUTG_BUTTON_X_WIDTH,            AUTG_BUTTON_Y_WIDTH},
+                                                                  {SEND10_SCREEN_CODE,          SEND10_BUTTON_X,          SEND10_BUTTON_Y,          SEND10_BUTTON_X_WIDTH,            SEND10_BUTTON_Y_WIDTH},
+                                                                  {MAXG_SCREEN_CODE,          MAXG_BUTTON_X,          MAXG_BUTTON_Y,          MAXG_BUTTON_X_WIDTH,            MAXG_BUTTON_Y_WIDTH}};
+                                                                  
 
 uint16_t keyboardButtons[5] =                                       {}; //runtime dispersion
 char row[3][10] = {{'Q','W','E','R','T','Y','U','I','O','P'},

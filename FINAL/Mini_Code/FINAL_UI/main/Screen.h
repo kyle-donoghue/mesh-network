@@ -355,6 +355,10 @@ void handleScreen( uint16_t screenCode) {
             currentScreen = ENTERID_SCREEN_CODE;
             drawEnterID();
             break;
+        case DEV_SCREEN_CODE:
+            currentScreen = DEV_SCREEN_CODE;
+            drawDev();
+            break;
         default: ;
     }
     return;

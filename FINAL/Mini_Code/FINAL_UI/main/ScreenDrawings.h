@@ -115,7 +115,13 @@ void drawContactsScreen() { // 14
    tft.setTextColor(WHITE);
    tft.setTextSize(1);
    tft.println("DEL");
-    
+   
+   tft.fillRect(DEV_BUTTON_X,DEV_BUTTON_Y,DEV_BUTTON_X_WIDTH,DEV_BUTTON_Y_WIDTH,BLUE );
+   tft.setCursor(DEV_BUTTON_X + 10,DEV_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("DEV");
+   
     tft.fillRect(SHUTDOWN_BUTTON_X, SHUTDOWN_BUTTON_Y, SHUTDOWN_BUTTON_X_WIDTH, SHUTDOWN_BUTTON_Y_WIDTH,RED);
     tft.setCursor(SHUTDOWN_BUTTON_X+5,SHUTDOWN_BUTTON_Y + 7);
    tft.setTextColor(WHITE);
@@ -287,7 +293,7 @@ for (uint8_t i = 0; i < 114; i++) {
    tft.setTextSize(1);
    tft.println("DEL");
     
-    
+
 
 //    //MAIN/HOME BUTTON
 //    tft.fillTriangle(MAIN_BUTTON_X + 300,MAIN_BUTTON_Y,MAIN_BUTTON_X + 280,MAIN_BUTTON_Y + 20, MAIN_BUTTON_X + 320,MAIN_BUTTON_Y+20,MAGENTA );
@@ -344,4 +350,67 @@ void drawEnterName() {
    tft.setTextColor(WHITE);
    tft.setTextSize(1);
    tft.println("ADD");
+}
+
+void drawDev() {
+    tft.fillScreen(BLACK);
+  tft.fillRect(SF7_BUTTON_X,SF7_BUTTON_Y,SF7_BUTTON_X_WIDTH,SF7_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(SF7_BUTTON_X + 10,SF7_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("SF7");
+   tft.fillRect(SF9_BUTTON_X,SF9_BUTTON_Y,SF9_BUTTON_X_WIDTH,SF9_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(SF9_BUTTON_X + 10,SF9_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("SF9");
+   tft.fillRect(SF11_BUTTON_X,SF11_BUTTON_Y,SF11_BUTTON_X_WIDTH,SF11_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(SF11_BUTTON_X + 10,SF11_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("SF11");
+
+   tft.fillRect(BW125_BUTTON_X,BW125_BUTTON_Y,BW125_BUTTON_X_WIDTH,BW125_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(BW125_BUTTON_X + 10,BW125_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("BW125");
+   tft.fillRect(BW250_BUTTON_X,BW250_BUTTON_Y,BW250_BUTTON_X_WIDTH,BW250_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(BW250_BUTTON_X + 10,BW250_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("BW250");
+   tft.fillRect(BW500_BUTTON_X,BW500_BUTTON_Y,BW500_BUTTON_X_WIDTH,BW500_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(BW500_BUTTON_X + 10,BW500_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("BW500");
+
+   tft.fillRect(CRCON_BUTTON_X,CRCON_BUTTON_Y,CRCON_BUTTON_X_WIDTH,CRCON_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(CRCON_BUTTON_X + 10,CRCON_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("CRCON");
+   tft.fillRect(CRCOFF_BUTTON_X,CRCOFF_BUTTON_Y,CRCOFF_BUTTON_X_WIDTH,CRCOFF_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(CRCOFF_BUTTON_X + 10,CRCOFF_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("CRCOFF");
+
+   tft.fillRect(AUTG_BUTTON_X,AUTG_BUTTON_Y,AUTG_BUTTON_X_WIDTH,AUTG_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(AUTG_BUTTON_X + 10,AUTG_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("AUTG");
+   tft.fillRect(MAXG_BUTTON_X,MAXG_BUTTON_Y,MAXG_BUTTON_X_WIDTH,MAXG_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(MAXG_BUTTON_X + 10,MAXG_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("MAXG");
+
+   tft.fillRect(SEND10_BUTTON_X,SEND10_BUTTON_Y,SEND10_BUTTON_X_WIDTH,SEND10_BUTTON_Y_WIDTH,RED );
+   tft.setCursor(SEND10_BUTTON_X + 10,SEND10_BUTTON_Y + 5);
+   tft.setTextColor(WHITE);
+   tft.setTextSize(1);
+   tft.println("SEND10");
 }
