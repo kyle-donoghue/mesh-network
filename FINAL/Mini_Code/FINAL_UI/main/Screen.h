@@ -177,7 +177,19 @@ uint16_t getButton(int x, int y) {
                 }
                 return receivedScreenButtons[i][0];
             }
-            return 0;            
+            return 0;
+        case DEV_SCREEN_CODE:
+            for(int i = 0; i < DEV_SCREEN_BUTTON_COUNT; i++){
+
+                if( !((x >= devScreenButtons[i][1]) && (x <= devScreenButtons[i][1]+devScreenButtons[i][3])) ){ // if x , then go to contacts/logs
+                    continue;
+                }
+                if( !((y >= devScreenButtons[i][2]) && (y <= devScreenButtons[i][2]+devScreenButtons[i][4])) ){ // if y matches, then go to contacts/logs
+                    continue;
+                }
+                return devScreenButtons[i][0];
+            }
+            return 0;         
         default: ;
     }
     return 0;
@@ -287,6 +299,22 @@ void contactsPageChange(bool down) {
   requestContacts(reqContactsInd);
 }
 
+void setParam(uint8_t code) {
+  tft.setCursor(0, 200);
+  tft.setTextColor(RED);
+  tft.setTextSize(2);
+  tft.println("SETTING");
+
+  Serial.write(code);
+  waitForAck();
+
+  tft.setCursor(0, 200);
+  tft.setTextColor(BLACK);
+  tft.setTextSize(2);
+  tft.println("SETTING");
+  return;
+}
+
 void handleScreen( uint16_t screenCode) {
     switch(screenCode) {
         case MAIN_SCREEN_CODE:
@@ -350,7 +378,6 @@ void handleScreen( uint16_t screenCode) {
             addContact();
             handleScreen(CONTACTS_SCREEN_CODE);
             break;
-
         case ADD_CONTACT_SCREEN_CODE:
             currentScreen = ENTERID_SCREEN_CODE;
             drawEnterID();
@@ -358,6 +385,45 @@ void handleScreen( uint16_t screenCode) {
         case DEV_SCREEN_CODE:
             currentScreen = DEV_SCREEN_CODE;
             drawDev();
+            break;
+        case BW125_SCREEN_CODE:
+            setParam(BW125_SET);
+            break;
+        case BW250_SCREEN_CODE:
+            setParam(BW250_SET);
+            break;
+        case BW500_SCREEN_CODE:
+            setParam(BW500_SET);
+            break;
+        case SF7_SCREEN_CODE:
+            setParam(SF7_SET);
+            break;
+        case SF9_SCREEN_CODE:
+            setParam(SF9_SET);
+            break;
+        case SF11_SCREEN_CODE:
+            setParam(SF11_SET);
+            break;
+        case CRCON_SCREEN_CODE:
+            setParam(CRCON_SET);
+            break;
+        case CRCOFF_SCREEN_CODE:
+            setParam(CRCOFF_SET);
+            break;
+        case CR5_SCREEN_CODE:
+            setParam(CR5_SET);
+            break;
+        case CR8_SCREEN_CODE:
+            setParam(CR8_SET);
+            break;
+        case AUTG_SCREEN_CODE:
+            setParam(AUTG_SET);
+            break;
+        case MAXG_SCREEN_CODE:
+            setParam(MAXG_SET);
+            break;
+        case SEND10_SCREEN_CODE:
+            setParam(SEND10_SET);
             break;
         default: ;
     }

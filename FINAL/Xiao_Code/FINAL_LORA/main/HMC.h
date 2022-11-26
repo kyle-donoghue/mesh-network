@@ -349,15 +349,36 @@ void receiveMessage( int packetSize ) { //can only Lora.read() one byte at a tim
     for (uint8_t i = 0; i < 122; i++) {
         rawPacket[i] = LoRa.read();
     }
-
-   
-    
-    
-
-    //}
     return;
 }
 
+void sendTest(uint8_t num) {
+  uint16_t N_ID = NETWORK_ID;
+  uint16_t S_ID = DEVICE_ID;
+  uint16_t M_ID = randomGen();
+  uint16_t R_ID = 3;
+  
+  LoRa.beginPacket();
+  for (int i = 1; i >= 0;i--) {
+      LoRa.write((N_ID >> (8*i)) & 0xFF);
+  }
+  for (int i = 1; i >= 0;i--) {
+      LoRa.write((M_ID >> (8*i)) & 0xFF);
+  }
+  for (int i = 1; i >= 0;i--) {
+      LoRa.write((R_ID >> (8*i)) & 0xFF);
+  }
+  for (int i = 1; i >= 0;i--) {
+      LoRa.write((S_ID >> (8*i)) & 0xFF);
+  }
+  for (int i = 0; i < 113;i++) {
+      LoRa.write(num+48); //convert num to ascii
+  }
+  LoRa.write('\0'); //end with null terminator
+  LoRa.endPacket();
+  LoRa.receive();
+  return;
+}
 
 uint8_t handleUART(uint8_t handleCode) {
     uint8_t tmp_handler = READY;
@@ -400,6 +421,74 @@ uint8_t handleUART(uint8_t handleCode) {
         }
         case SHUTDOWN: {
           shutdownHMC();
+          Serial1.write(ACK);
+          break;
+        }
+        case BW125_SET: {
+          LoRa.setSignalBandwidth(125E3);
+          Serial1.write(ACK);
+          break;
+        }
+        case BW250_SET: {
+          LoRa.setSignalBandwidth(250E3);
+          Serial1.write(ACK);
+          break;
+        }
+        case BW500_SET: {
+          LoRa.setSignalBandwidth(500E3);
+          Serial1.write(ACK);
+          break;
+        }
+        case SF7_SET: {
+          LoRa.setSpreadingFactor(7);
+          Serial1.write(ACK);
+          break;
+        }
+        case SF9_SET: {
+          LoRa.setSpreadingFactor(9);
+          Serial1.write(ACK);
+          break;
+        }
+        case SF11_SET: {
+          LoRa.setSpreadingFactor(11);
+          Serial1.write(ACK);
+          break;
+        }
+        case CRCON_SET: {
+          LoRa.enableCrc();
+          Serial1.write(ACK);
+          break;
+        }
+        case CRCOFF_SET: {
+          LoRa.disableCrc();
+          Serial1.write(ACK);
+          break;
+        }
+        case CR5_SET: {
+          LoRa.setCodingRate4(5);
+          Serial1.write(ACK);
+          break;
+        }
+        case CR8_SET: {
+          LoRa.setCodingRate4(8);
+          Serial1.write(ACK);
+          break;
+        }
+        case AUTG_SET: {
+          LoRa.setGain(0);
+          Serial1.write(ACK);
+          break;
+        }
+        case MAXG_SET: {
+          LoRa.setGain(6);
+          Serial1.write(ACK);
+          break;
+        }
+        case SEND10_SET: {
+          for(uint8_t sendn = 0; sendn < 10; sendn++) {
+            sendTest(sendn);
+            delay(2500);
+          }
           Serial1.write(ACK);
           break;
         }

@@ -53,8 +53,11 @@ uint16_t devScreenButtons[DEV_SCREEN_BUTTON_COUNT][5] =         {{BW125_SCREEN_C
                                                                   {SF11_SCREEN_CODE,          SF11_BUTTON_X,          SF11_BUTTON_Y,          SF11_BUTTON_X_WIDTH,            SF11_BUTTON_Y_WIDTH},
                                                                   {CRCON_SCREEN_CODE,          CRCON_BUTTON_X,          CRCON_BUTTON_Y,          CRCON_BUTTON_X_WIDTH,            CRCON_BUTTON_Y_WIDTH},
                                                                   {CRCOFF_SCREEN_CODE,          CRCOFF_BUTTON_X,          CRCOFF_BUTTON_Y,          CRCOFF_BUTTON_X_WIDTH,            CRCOFF_BUTTON_Y_WIDTH},
+                                                                  {CR5_SCREEN_CODE,          CR5_BUTTON_X,          CR5_BUTTON_Y,          CR5_BUTTON_X_WIDTH,            CR5_BUTTON_Y_WIDTH},
+                                                                  {CR8_SCREEN_CODE,          CR8_BUTTON_X,          CR8_BUTTON_Y,          CR8_BUTTON_X_WIDTH,            CR8_BUTTON_Y_WIDTH},
                                                                   {AUTG_SCREEN_CODE,          AUTG_BUTTON_X,          AUTG_BUTTON_Y,          AUTG_BUTTON_X_WIDTH,            AUTG_BUTTON_Y_WIDTH},
                                                                   {SEND10_SCREEN_CODE,          SEND10_BUTTON_X,          SEND10_BUTTON_Y,          SEND10_BUTTON_X_WIDTH,            SEND10_BUTTON_Y_WIDTH},
+                                                                  {CONTACTS_SCREEN_CODE,              CONTACTS_BUTTON_X,              CONTACTS_BUTTON_Y,              CONTACTS_BUTTON_X_WIDTH,                CONTACTS_BUTTON_Y_WIDTH},
                                                                   {MAXG_SCREEN_CODE,          MAXG_BUTTON_X,          MAXG_BUTTON_Y,          MAXG_BUTTON_X_WIDTH,            MAXG_BUTTON_Y_WIDTH}};
                                                                   
 

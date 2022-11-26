@@ -16,6 +16,20 @@
 #define SHUTDOWN 28
 #define BATT 30
 
+#define BW125_SET 50
+#define BW250_SET 51
+#define BW500_SET 52
+#define SF7_SET 53
+#define SF9_SET 54
+#define SF11_SET 55
+#define CRCON_SET 56
+#define CRCOFF_SET 57
+#define CR5_SET 61
+#define CR8_SET 62
+#define AUTG_SET 58
+#define MAXG_SET 59
+#define SEND10_SET 60
+
 //Screen Codes
 #define LOG_SCREEN_CODE 1
 #define MAIN_SCREEN_CODE 2

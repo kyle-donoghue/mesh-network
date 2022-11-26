@@ -35,7 +35,7 @@
 #define LOG_SCREEN_BUTTON_COUNT 3
 #define COMPOSE_SCREEN_BUTTON_COUNT 4
 #define RECEIVED_SCREEN_BUTTON_COUNT 2
-#define DEV_SCREEN_BUTTON_COUNT 11
+#define DEV_SCREEN_BUTTON_COUNT 14
     //TO-DO: need other button defines
 
 //TO-DO: UART defines
@@ -267,6 +267,15 @@
 #define CRCOFF_BUTTON_X_WIDTH 40
 #define CRCOFF_BUTTON_Y_WIDTH 20
 
+#define CR5_BUTTON_X 150
+#define CR5_BUTTON_Y 80
+#define CR5_BUTTON_X_WIDTH 40
+#define CR5_BUTTON_Y_WIDTH 20
+#define CR8_BUTTON_X 200
+#define CR8_BUTTON_Y 80
+#define CR8_BUTTON_X_WIDTH 40
+#define CR8_BUTTON_Y_WIDTH 20
+
 #define AUTG_BUTTON_X 50
 #define AUTG_BUTTON_Y 110
 #define AUTG_BUTTON_X_WIDTH 40
@@ -317,6 +326,21 @@
 #define SHUTDOWN 28
 #define BATTERYREQ 30
 
+#define BW125_SET 50
+#define BW250_SET 51
+#define BW500_SET 52
+#define SF7_SET 53
+#define SF9_SET 54
+#define SF11_SET 55
+#define CRCON_SET 56
+#define CRCOFF_SET 57
+#define CR5_SET 61
+#define CR8_SET 62
+#define AUTG_SET 58
+#define MAXG_SET 59
+#define SEND10_SET 60
+
+
 //Screen Codes
 #define LOG_SCREEN_CODE 1
 #define MAIN_SCREEN_CODE 2
@@ -352,6 +376,8 @@
 #define SF11_SCREEN_CODE 29
 #define CRCON_SCREEN_CODE 30
 #define CRCOFF_SCREEN_CODE 31
+#define CR5_SCREEN_CODE 35
+#define CR8_SCREEN_CODE 36
 #define AUTG_SCREEN_CODE 32
 #define MAXG_SCREEN_CODE 33
 #define SEND10_SCREEN_CODE 34
