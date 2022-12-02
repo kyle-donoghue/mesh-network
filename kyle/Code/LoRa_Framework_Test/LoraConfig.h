@@ -1,7 +1,7 @@
 //Device Properties
 #define DEVICE_ID = 594385720; //randomly-chosen ID for this device
 #define NETWORK_ID = 11122333; //networkID of our intials: K,L,W,C,C
-
+//TEST TEST
 //Lora Parameters
 #define CS_PIN = 7;
 #define RESET_PIN = 6;
