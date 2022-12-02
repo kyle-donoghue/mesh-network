@@ -50,7 +50,7 @@
 
 
 //Device Properties
-#define DEVICE_ID 1 //chosen ID for this device
+#define DEVICE_ID 2 //chosen ID for this device
 #define NETWORK_ID 12345
 
 //Lora Parameters

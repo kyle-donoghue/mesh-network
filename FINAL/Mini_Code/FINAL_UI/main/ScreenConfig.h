@@ -17,7 +17,7 @@ uint16_t mainScreenButtons[MAIN_SCREEN_BUTTON_COUNT][5] =          {{CONTACTS_SC
 uint16_t contactsScreenButtons[CONTACTS_SCREEN_BUTTON_COUNT][5] =  {/*{MAIN_SCREEN_CODE,              MAIN_BUTTON_X,              MAIN_BUTTON_Y,              MAIN_BUTTON_X_WIDTH,                MAIN_BUTTON_Y_WIDTH},*/
                                                                     {ADD_CONTACT_SCREEN_CODE,       ADD_CONTACT_BUTTON_X,       ADD_CONTACT_BUTTON_Y,       ADD_CONTACT_BUTTON_X_WIDTH,         ADD_CONTACT_BUTTON_Y_WIDTH},
                                                                     {DELETE_CONTACT_SCREEN_CODE,    DELETE_CONTACT_BUTTON_X,    DELETE_CONTACT_BUTTON_Y,    DELETE_CONTACT_BUTTON_X_WIDTH,      DELETE_CONTACT_BUTTON_Y_WIDTH},
-                                                                    {DEV_SCREEN_CODE,    DEV_BUTTON_X,    DEV_BUTTON_Y,    DEV_BUTTON_X_WIDTH,      DEV_BUTTON_Y_WIDTH},
+                                                                    /*{DEV_SCREEN_CODE,    DEV_BUTTON_X,    DEV_BUTTON_Y,    DEV_BUTTON_X_WIDTH,      DEV_BUTTON_Y_WIDTH},*/
                                                                     {SHUTDOWN_SCREEN_CODE,          SHUTDOWN_BUTTON_X,          SHUTDOWN_BUTTON_Y,          SHUTDOWN_BUTTON_X_WIDTH,            SHUTDOWN_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_DOWN_SCREEN_CODE,  CONTACTS_PG_DOWN_BUTTON_X,  CONTACTS_PG_DOWN_BUTTON_Y,  CONTACTS_PG_DOWN_BUTTON_X_WIDTH,    CONTACTS_PG_DOWN_BUTTON_Y_WIDTH},
                                                                     {CONTACTS_PG_UP_SCREEN_CODE,    CONTACTS_PG_UP_BUTTON_X,    CONTACTS_PG_UP_BUTTON_Y,    CONTACTS_PG_UP_BUTTON_X_WIDTH,      CONTACTS_PG_UP_BUTTON_Y_WIDTH},

@@ -115,13 +115,13 @@ void drawContactsScreen() { // 14
    tft.setTextColor(WHITE);
    tft.setTextSize(1);
    tft.println("DEL");
-   
+   /*
    tft.fillRect(DEV_BUTTON_X,DEV_BUTTON_Y,DEV_BUTTON_X_WIDTH,DEV_BUTTON_Y_WIDTH,BLUE );
    tft.setCursor(DEV_BUTTON_X + 10,DEV_BUTTON_Y + 5);
    tft.setTextColor(WHITE);
    tft.setTextSize(1);
    tft.println("DEV");
-   
+   */
     tft.fillRect(SHUTDOWN_BUTTON_X, SHUTDOWN_BUTTON_Y, SHUTDOWN_BUTTON_X_WIDTH, SHUTDOWN_BUTTON_Y_WIDTH,RED);
     tft.setCursor(SHUTDOWN_BUTTON_X+5,SHUTDOWN_BUTTON_Y + 7);
    tft.setTextColor(WHITE);
